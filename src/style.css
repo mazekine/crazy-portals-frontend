@@ -1,0 +1,52 @@
+/* @import "./static/font/stylesheet.css"; */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@font-face {
+    font-family: "Raider";   /*Can be any text*/
+    src: local("AirbnbCerealLight"),
+      url("./fonts/raider_crusader/raidercrusader.ttf") format("truetype");
+  }
+
+#root {
+   --accent: #007ACC;
+
+   --bg_root: #F7F9FA;
+
+   --bg_header: #fff;
+
+   --bg_secondory_btn: #EEF4FF;
+
+   --bg_secondory_btn_hover: #d2ddf3;
+
+   --bg_footer: #F7F7F9;
+
+   --border_color: #B1C5FA;
+
+   --color_text_btn_default: #fff;
+
+   --color_text_btn_secondary: #5D9EEC;
+
+   --color_text_btn_outline: #2B63F1;
+
+   --color_text_opacity: #8B909A;
+
+   --color_text_opacity2:rgb(108, 112, 120)A;
+
+   --pd_1: 16px;
+   --mr_1: 16px;
+
+   --height_header: 90px;
+
+}
+
+html,
+body {
+    margin: 0!important;
+    padding: 0!important;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+.raider-font {
+    font-family: 'Raider', 'Poppins', sans-serif;
+}

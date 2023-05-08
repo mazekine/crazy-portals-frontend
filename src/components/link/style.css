@@ -1,0 +1,10 @@
+.link {
+    cursor: pointer;
+    color: var(--color_text_opacity);
+    display: block;
+    font-weight: 300;
+}
+
+.link:hover {
+    color: var(--color_text_opacity2)
+}

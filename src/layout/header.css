@@ -1,0 +1,31 @@
+.logo {
+    cursor: pointer;
+}
+
+.balance-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: fit-content;
+}
+
+
+.balance-block > * {
+    margin-right: 9px;
+}
+
+.logo-24 {
+    width: 24px;
+    height: 24px;
+}
+
+.logo-20 {
+    width: 20px;
+    height: 20px;
+}
+
+.text-secondory {
+    font-size: 12px;
+    opacity: 0.6;
+}

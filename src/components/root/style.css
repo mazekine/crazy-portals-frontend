@@ -1,0 +1,23 @@
+.app_root {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: start;
+
+    background-color: var(--bg_root);
+}
+
+.app_root_in {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.header-fix {
+    padding-top: var(--height_header);
+    min-height: calc(100vh - var(--height_header) - 333px - 2px);
+}

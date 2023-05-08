@@ -1,0 +1,5 @@
+.div {
+    padding: var(--pd_1);
+    margin: var(--mr_1) 0 var(--mr_1) 0;
+    box-sizing: border-box;
+}
