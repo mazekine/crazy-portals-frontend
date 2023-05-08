@@ -1,0 +1,174 @@
+.panel-boards .page-block {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+}
+
+.panel-boards .left-menu {
+    width: 37%
+}
+
+.panel-boards .content-block {
+    width: 61%;
+}
+
+.panel-boards .header-block .info-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+
+    height: 200px;
+}
+
+.info-block > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.info-block h3 {
+    font-size: 28px;
+    font-weight: 600;
+
+    margin: 0;
+}
+
+.info-block h4 {
+    font-size: 24px;
+    font-weight: 600;
+
+    margin: 0;
+}
+
+.info-block span {
+    font-size: 16px;
+    font-weight: 400;
+
+    margin-left: 4px;
+}
+
+.info-block .blue-text {
+    font-size: 12px;
+    color: #007ACC;
+    font-weight: 400;
+}
+
+.map-block h4 {
+    font-weight: 700;
+    font-size: 20px;
+
+    color: #007ACC;
+
+    text-align: center;
+    margin: 0;
+}
+
+.map-block .blue-text {
+    color: #007ACC;
+    font-weight: 400;
+font-size: 12px;
+text-align: center;
+}
+
+.panel-boards .group-block {
+    border-radius: 8px;
+    border: 1px solid var(--border_color);
+
+    background-color: #fff;
+
+    overflow: hidden;
+}
+
+.panel-boards .header-block {
+    background: radial-gradient(94.17% 261.11% at 4.62% 5.83%, rgba(0, 122, 204, 0.15) 0%, rgba(0, 122, 204, 0) 100%), #EEF4FF;
+    padding: 20px;
+
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+}
+
+.panel-boards .map-block {
+    width: 200px;
+    height: 200px;
+    margin-right: 0px;
+
+    border-radius: 16px;
+
+    background-color: #fff;
+}
+
+.panel-boards .info-block {
+    width: fit-content;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 10px;
+}
+
+.info-of-game {
+    height: 340px;
+    overflow-y: scroll;
+}
+
+.info-of-game .in-block {
+    height: 700px;
+}
+
+.table-block {
+    width: 100%;
+}
+
+.table-block tr th:first-child,
+.table-block tr td:first-child{
+    text-align: start;
+}
+
+.table-block tr td:first-child {
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.table-block tr td:first-child:hover {
+    opacity: 0.7;
+}
+
+.table-block thead th {
+    font-size: 12px;
+    font-weight: 600;
+    color: #BDBDBD;
+
+    text-align: end;
+}
+
+.table-block tbody td {
+    font-weight: 500;
+    font-size: 12px;
+
+    text-align: end;
+}
+
+.table-block tr {
+    padding: 4px;
+    border: 1px solid #EEF4FF;
+}
+
+.table-block th {
+    padding-top: 8px;
+    padding-bottom: 8px;
+
+    border-bottom: 1px solid #EEF4FF;
+}
+
+.table-block td {
+    padding-top: 8px;
+    padding-bottom: 8px;
+
+    border-bottom: 1px solid #EEF4FF;
+}

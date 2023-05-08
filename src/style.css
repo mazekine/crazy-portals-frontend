@@ -10,7 +10,7 @@
 #root {
    --accent: #007ACC;
 
-   --bg_root: #F7F9FA;
+   --bg_root: #Fff;
 
    --bg_header: #fff;
 
@@ -30,7 +30,9 @@
 
    --color_text_opacity: #8B909A;
 
-   --color_text_opacity2:rgb(108, 112, 120)A;
+   --color_text_opacity2:rgb(108, 112, 120);
+
+   --border_color: #CCDEFF;
 
    --pd_1: 16px;
    --mr_1: 16px;
@@ -49,4 +51,16 @@ body {
 
 .raider-font {
     font-family: 'Raider', 'Poppins', sans-serif;
+}
+
+.nav-bar { /* TODO */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding-top: 12px; */
+    padding-bottom: 16px;
+}
+
+.nav-bar > * {
+    margin-right: 10px;
 }

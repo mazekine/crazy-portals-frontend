@@ -9,10 +9,10 @@ import { FooterBlock } from './layout/footer'
 
 import { Main } from './pages/main'
 import { Boards } from './pages/boards'
-import { Wallet } from './logic/wallet'
+import { Board } from './pages/board'
 import { useEverWallet } from './logic/wallet/useEverWallet'
 
-const widthDesktop = 1100
+const widthDesktop = 1160
 
 const widthMobile = 750
 
@@ -77,6 +77,15 @@ export const App: React.FC = () => {
                     <Route path="/boards" element={
                         <Boards
                             id={'boards'}
+                        />
+                    }/>
+
+                    <Route path="/boards/:address" element={
+                        <Board
+                            id={'board'}
+                            isDesktop={isDesktop}
+                            widthDesktop={widthDesktop}
+                            isMobile={isMobile}
                         />
                     }/>
                 </Routes>
