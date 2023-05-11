@@ -45,8 +45,8 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                 ? board.map((x, key) => (
                     <div key={key} className="line">
                         {x.map((y, key2) => (
-                            <div key={key2} className="pixel">
-                                {y.number}
+                            <div key={key2} className={'pixel ' + y.type}>
+                                {y.type === 'win' ? null : y.number}
                             </div>
                         ))}
                     </div>

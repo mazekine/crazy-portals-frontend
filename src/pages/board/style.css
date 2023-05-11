@@ -110,7 +110,20 @@
     border: 2px dashed #0062AD;
 
     color: #0062AD;
+}
 
-    width: 40px;
-    height: 40px;
+.portal-blue {
+    background-color: #CCDEFF!important;
+    border: 2px dashed #0062AD!important;
+    color: #0062AD!important;
+}
+
+.portal-red {
+    background-color: #FFEEEA!important;
+    border: 2px dashed #B91C23!important;
+    color: #B91C23!important;
+}
+
+.win {
+
 }
