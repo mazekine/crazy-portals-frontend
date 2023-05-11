@@ -107,6 +107,9 @@ class Game {
                     type: type as ObjPixel['type'],
                     position: [ i, i2 ]
                 })
+
+
+
                 
             }
 
