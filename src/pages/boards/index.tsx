@@ -6,6 +6,11 @@ import { Panel, Div, Button, Link, Icon } from '../../components'
 
 import chery from '../../img/chery.svg'
 
+import sqad from '../../img/sqad.svg'
+import sqad2 from '../../img/sqad.svg'
+import portal from '../../img/portal.svg'
+import portal2 from '../../img/portal2.svg'
+
 interface MainProps {
     id: string
 }
@@ -43,9 +48,29 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                         <div className="group-block">
                             <div className="header-block">
                                 <div className="map-block">
-                                    <div>
+                                    <div style={{ padding: '0 0 20px 0', width: '100%' }}>
                                         <h4>Fiercy Trickster</h4>
                                         <div className="blue-text">Hard</div>
+                                    </div>
+                                    <div className="hr" />
+                                    <div style={{  width: '100%' }}>
+                                        <div className="map-block-cell">
+                                            <Icon src={sqad} size={16} />
+                                            <span>16 x 16 cells</span>
+                                            <div className="map-block-cell-right">
+                                                <Icon src={portal} size={24} />
+                                                <span>14</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="map-block-cell">
+                                            <Icon src={sqad2} size={16} />
+                                            <span>100 players</span>
+                                            <div className="map-block-cell-right color-blue">
+                                                <Icon src={portal2} size={24} />
+                                                <span>2</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
