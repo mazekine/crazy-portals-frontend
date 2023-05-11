@@ -116,14 +116,58 @@
     background-color: #CCDEFF!important;
     border: 2px dashed #0062AD!important;
     color: #0062AD!important;
+
+    /* z-index: 5; */
 }
 
 .portal-red {
     background-color: #FFEEEA!important;
     border: 2px dashed #B91C23!important;
     color: #B91C23!important;
+
+    /* z-index: 5; */
 }
 
 .win {
 
+}
+
+.board .pixel {
+    position: relative;
+    z-index: 3;
+}
+
+.board .pixel:hover {
+    z-index: 100;
+}
+
+.board .pixel:hover .line-2,
+.board .pixel:hover .line-3 {
+    display: block;
+}
+
+.line-2 {
+    display: none;
+    height: 0px;
+    /* background-color: #0062AD; */
+    position: absolute;
+    bottom: -3px;
+    left: 18px;
+    transform-origin: 0 0;
+    z-index: 0;
+
+    border-bottom: 2px dashed #0062AD
+}
+
+.line-3 {
+    display: none;
+    height: 0px;
+    /* background-color: #0062AD; */
+    position: absolute;
+    top: -4px;
+    left: 13px;
+    transform-origin: 0 0;
+    z-index: 0;
+
+    border-bottom: 2px dashed #0062AD
 }
