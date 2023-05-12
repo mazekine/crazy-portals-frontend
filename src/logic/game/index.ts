@@ -107,8 +107,6 @@ class Game {
                     type: type as ObjPixel['type'],
                     position: [ i, i2 ]
                 })
-
-
             }
 
             if (i % 2) {
