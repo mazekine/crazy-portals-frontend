@@ -6,32 +6,59 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr } from '../../logic/utils'
-import { Game, ObjPixel } from '../../logic/game'
+import { Game, InfoGames, ObjPixel } from '../../logic/game'
 
 import { BoardBlock } from './board'
+import { Wallet } from '../../logic/wallet'
+import { EverWallet } from '../../logic/wallet/hook'
+import { Address } from 'everscale-inpage-provider'
 
 interface MainProps {
     id: string,
     isDesktop: boolean,
     widthDesktop: number,
-    isMobile: boolean
+    isMobile: boolean,
+    everWallet: EverWallet
 }
 
 export const Board: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
 
+    const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
+
+    const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
+
     const { address } = useParams()
     const history = useNavigate()
+
+    async function getInfo (list: Address[]) {
+        if (!game) return undefined
+        const info = await game.getAllInfoGames(list)
+
+        if (!info) return undefined
+        setInfoGame(info[0])
+
+
+        return true
+    }
 
     useEffect(() => {
         if (!firstRender) {
             setFirstRender(true)
+
+            setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
         }
     }, [])
 
     useEffect(() => {
-        if (address) {
+        if (address && game) {
+            getInfo([ new Address(address) ])
+        }
+    }, [ address, game ])
 
+    useEffect(() => {
+        if (address) {
+            getInfo([ new Address(address) ])
         } else {
             history('/boards')
         }
@@ -69,8 +96,8 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
 
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center'}}>
-                            <BoardBlock {...props} />
+                        <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
+                            <BoardBlock {...props} infoGame={infoGame} game={game} />
                         </div>
 
                     </div>

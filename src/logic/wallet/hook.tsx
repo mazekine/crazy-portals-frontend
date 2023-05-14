@@ -13,6 +13,7 @@ export interface EverWallet {
     selectedNetworkId: number,
     account: Account | undefined,
     balance: string,
+    provider: ProviderRpcClient | undefined,
     login: Function,
     logout: Function
 }
@@ -24,6 +25,7 @@ const InitialState = {
     selectedNetworkId: 1,
     account: undefined,
     balance: '0',
+    provider: undefined,
     login: () => null,
     logout: () => null
 } as EverWallet
@@ -44,6 +46,8 @@ export function EverWalletProvider ({ children, ever }: EverConf): JSX.Element  
     const [ balance, setBalance ] = useState<string>('0')
 
     const [ isConnectingInProgress, setIsConnectingInProgress ] = useState(false)
+
+    const provider = ever
 
     // Initializing
     useEffect(() => {
@@ -121,6 +125,7 @@ export function EverWalletProvider ({ children, ever }: EverConf): JSX.Element  
         selectedNetworkId,
         account,
         balance,
+        provider,
         login,
         logout
     }}>

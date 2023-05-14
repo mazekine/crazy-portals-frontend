@@ -77,6 +77,10 @@ export const App: React.FC = () => {
                     <Route path="/boards" element={
                         <Boards
                             id={'boards'}
+                            isDesktop={isDesktop}
+                            widthDesktop={widthDesktop}
+                            isMobile={isMobile}
+                            everWallet={everWallet}
                         />
                     }/>
 
@@ -86,6 +90,7 @@ export const App: React.FC = () => {
                             isDesktop={isDesktop}
                             widthDesktop={widthDesktop}
                             isMobile={isMobile}
+                            everWallet={everWallet}
                         />
                     }/>
                 </Routes>

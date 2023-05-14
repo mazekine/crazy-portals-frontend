@@ -6,13 +6,17 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr } from '../../logic/utils'
-import { Game, ObjPixel, Portal } from '../../logic/game'
+import { Game, InfoGames, ObjPixel, Portal } from '../../logic/game'
+import { EverWallet } from '../../logic/wallet/hook'
 
 interface MainProps {
     id: string,
     isDesktop: boolean,
     widthDesktop: number,
-    isMobile: boolean
+    isMobile: boolean,
+    everWallet: EverWallet,
+    game: Game | undefined,
+    infoGame: InfoGames | undefined
 }
 
 export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
@@ -26,20 +30,23 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
     const history = useNavigate()
 
     useEffect(() => {
-        if (!firstRender) {
+        if (!firstRender && props.infoGame && props.infoGame.info && address) {
             setFirstRender(true)
-        }
-    }, [])
 
-    useEffect(() => {
-        if (address) {
-            const board1 = new Game({ address: '', addressUser: '' })
-
-            const localBoard = board1.genArrBoard(10)
+            const localBoard = Game.genArrBoard(
+                Number(props.infoGame.info._board.columns),
+                props.infoGame.info._blueBeams.concat(props.infoGame.info._redBeams)
+            )
 
             setBoard(localBoard[0])
 
             setPortals(localBoard[1])
+        }
+        console.log(props.infoGame, props.infoGame?.info, address)
+    }, [ props.infoGame, address ])
+
+    useEffect(() => {
+        if (address) {
         } else {
             history('/boards')
         }

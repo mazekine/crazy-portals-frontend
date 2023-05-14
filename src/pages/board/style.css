@@ -71,8 +71,8 @@
 }
 
 .board {
-    width: 472px;
-    height: 472px;
+    /* width: 472px;
+    height: 472px; */
 }
 
 .board .line {
@@ -151,8 +151,8 @@
     height: 0px;
     /* background-color: #0062AD; */
     position: absolute;
-    bottom: -3px;
-    left: 18px;
+    bottom: 20px;
+    left: 20px;
     transform-origin: 0 0;
     z-index: 0;
 
@@ -164,10 +164,15 @@
     height: 0px;
     /* background-color: #0062AD; */
     position: absolute;
-    top: -4px;
-    left: 13px;
+    top: 20px;
+    left: 20px;
     transform-origin: 0 0;
     z-index: 0;
 
     border-bottom: 2px dashed #0062AD
+}
+
+.portal-red .line-2,
+.portal-red .line-3 {
+    border-bottom: 2px dashed #B91C23
 }

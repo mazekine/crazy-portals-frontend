@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import './style.css'
+import { Address } from 'everscale-inpage-provider'
 import { Panel, Div, Button, Link, Icon } from '../../components'
 
 import chery from '../../img/chery.svg'
@@ -10,21 +11,60 @@ import sqad from '../../img/sqad.svg'
 import sqad2 from '../../img/sqad.svg'
 import portal from '../../img/portal.svg'
 import portal2 from '../../img/portal2.svg'
+import { Game, InfoGame, InfoGames } from '../../logic/game'
+import { EverWallet } from '../../logic/wallet/hook'
+import { addStr } from '../../logic/utils'
 
 interface MainProps {
-    id: string
+    id: string,
+    isDesktop: boolean,
+    widthDesktop: number,
+    isMobile: boolean,
+    everWallet: EverWallet
 }
 
 export const Boards: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
 
+    const [ listGames, setListGames ] = React.useState<Address[] | undefined>(undefined)
+
+    const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
+
+    const  [ infoGames, setInfoGames ] = React.useState<InfoGames[] | undefined>(undefined)
+
     const history = useNavigate()
+
+    async function getInfo (list: Address[] | undefined = listGames) {
+        if (!game || !list) return undefined
+        const info = await game.getAllInfoGames(list)
+
+        if (!info) return undefined
+        setInfoGames(info)
+
+        return true
+    }
 
     useEffect(() => {
         if (!firstRender) {
             setFirstRender(true)
+
+            setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
         }
     }, [])
+
+    useEffect(() => {
+        if (game) {
+            game.getAllGames().then((games) => {
+                if (games) setListGames(games)
+            })
+        }
+    }, [ game ])
+
+    useEffect(() => {
+        if (listGames && game) {
+            getInfo()
+        }
+    }, [ listGames ])
 
     return (
         <Panel id={props.id}>
@@ -35,8 +75,8 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                     <div>Boards</div>
                 </div>
 
-                <div className="page-block">
-                    <div className="left-menu">
+                <div className="page-block" style={props.isMobile ? { flexDirection: 'column' } : {}}>
+                    {props.isMobile ? null : <div className="left-menu">
                         <div className="title-bar">
                             <h3 className='raider-font'>Board of the Day</h3>
                             <div className="right-bar">
@@ -100,8 +140,8 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
                         </div>
 
-                    </div>
-                    <div className="content-block">
+                    </div>}
+                    <div className="content-block" style={props.isMobile ? { width: '99%' } : {}}>
 
                         <div className="title-bar">
                             <h3 className='raider-font'>All boards</h3>
@@ -125,21 +165,24 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td
-                                                onClick={
-                                                    () => history(
-                                                        '/boards/0:96b534ed78a62e44b9f6c9a7e643108230f19f7e582123297aaa914c43fdde04'
-                                                    )
-                                                }
-                                            >0:1234...5678</td>
-                                            <td>10x10</td>
-                                            <td>🔵 2 🔴 8</td>
-                                            <td>152</td>
-                                            <td>10</td>
-                                            <td>100.11</td>
-                                            <td>1 456.12</td>
-                                        </tr>
+                                        {infoGames && infoGames.map((gameL, key: number) => (
+                                            gameL && gameL.info && gameL.rounds ? <tr key={key}>
+                                                <td
+                                                    onClick={
+                                                        () => history(
+                                                            '/boards/' + gameL.address.toString()
+                                                        )
+                                                    }
+                                                >{addStr(gameL.address.toString())}</td>
+                                                <td>{gameL.info._board.columns + 'x' + gameL.info._board.columns}</td>
+                                                <td>🔵 {gameL.info._blueBeams.length} 🔴 {gameL.info._redBeams.length}</td>
+                                                <td>{gameL.rounds._rounds.length}</td>
+                                                <td>10</td>
+                                                <td>100.11</td>
+                                                <td>1 456.12</td>
+                                            </tr> : null
+                                        ))}
+
                                     </tbody>
                                 </table>
                             </Div>

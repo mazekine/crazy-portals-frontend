@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import './style.css'
 import { Panel, Div, Button } from '../../components'
@@ -16,6 +16,8 @@ interface MainProps {
 export const Main: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
 
+    const history = useNavigate()
+
     useEffect(() => {
         if (!firstRender) {
             setFirstRender(true)
@@ -30,7 +32,7 @@ export const Main: React.FC<MainProps> = (props: MainProps) => {
                     <p className="text">Play with your friends, or compete for prizes and jackpots in public championships!</p>
 
                     <div className="block-buttons" style={props.isMobile ? { width: '100%' } : {}}>
-                        <Button type="default" stretched>Win now!</Button>
+                        <Button type="default" stretched onClick={() => history('/boards')}>Win now!</Button>
                         <Button type="secondory" stretched>How to play</Button>
                     </div>
                 </div>

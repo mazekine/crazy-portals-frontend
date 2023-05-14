@@ -3,6 +3,26 @@ import { useContext } from 'react'
 import { EverWallet, EverWalletContext } from './hook'
 
 export function useEverWallet (): EverWallet {
-    const { isInitializing, isConnected, hasProvider, selectedNetworkId, account, balance, login, logout } = useContext(EverWalletContext)
-    return { isInitializing, isConnected, hasProvider, selectedNetworkId, account, balance, login, logout }
+    const {
+        isInitializing,
+        isConnected,
+        hasProvider,
+        selectedNetworkId,
+        account,
+        balance,
+        provider,
+        login,
+        logout
+    } = useContext(EverWalletContext)
+    return {
+        isInitializing,
+        isConnected,
+        hasProvider,
+        selectedNetworkId,
+        account,
+        balance,
+        provider,
+        login,
+        logout
+    }
 }
