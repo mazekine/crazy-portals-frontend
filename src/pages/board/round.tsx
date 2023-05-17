@@ -125,6 +125,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <Button onClick={() => game.joinRound(new Address(address), round)}>Join</Button>
                             </div>
 
+                            
+
                         </div>
 
                     </div> : null }
