@@ -1,6 +1,8 @@
 import { Address } from 'everscale-inpage-provider'
 import { Wallet } from 'logic/wallet'
-import { EverWallet } from 'logic/wallet/hook'
+import BigNumber from 'bignumber.js'
+import { EverWallet } from '../wallet/hook'
+import { useEverWallet } from '../wallet/useEverWallet'
 
 import * as abi from '../../Game.abi.json'
 
@@ -62,6 +64,18 @@ interface Round {
     winner: Address
 }
 
+interface Seed {
+    seed: string
+}
+
+interface Owner {
+    value0: Address
+}
+
+interface PrizeFundPerRound {
+    prizeFundPerRound: string
+}
+
 export interface Rounds {
     _rounds: Round[]
 }
@@ -69,7 +83,9 @@ export interface Rounds {
 export interface InfoGames {
     info: (InfoGame | undefined),
     rounds: (Rounds | undefined),
-    address: Address
+    address: Address,
+    seed: string,
+    owner: string
 
 }
 
@@ -119,6 +135,11 @@ class Game {
         this._address = params.address
         this._addressUser = params.addressUser
         this._wallet = params.wallet
+    }
+
+    public sunc (wallet: EverWallet): true {
+        this._wallet = wallet
+        return true
     }
 
     public static generatedCells (size: number): number[][] {
@@ -306,23 +327,155 @@ class Game {
         }
     }
 
+    public async getSeed (address: Address): Promise<Seed | undefined> {
+        if (!this._wallet.provider) return undefined
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.seed({ } as never)
+
+            const data = await getData.call()
+
+            console.log('getSeed', data)
+            return data as Seed
+        } catch (error) {
+            console.log('getSeed', error)
+            return undefined
+        }
+    }
+
+    public async getOwner (address: Address): Promise<Owner | undefined> {
+        if (!this._wallet.provider) return undefined
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.owner({ answerId: 0 } as never)
+
+            const data = await getData.call()
+
+            console.log('getOwner', data)
+            return data as Owner
+        } catch (error) {
+            console.log('getOwner', error)
+            return undefined
+        }
+    }
+
+    public async getPrizeFundPerRound (address: Address): Promise<PrizeFundPerRound | undefined> {
+        if (!this._wallet.provider) return undefined
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.prizeFundPerRound({ } as never)
+
+            const data = await getData.call()
+
+            console.log('getPrizeFundPerRound', data)
+            return data as PrizeFundPerRound
+        } catch (error) {
+            console.log('getPrizeFundPerRound', error)
+            return undefined
+        }
+    }
+
+    public async createRound (address: Address): Promise<true | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            console.log('createRound not start', this._wallet)
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.createRound({ answerId: 0 } as never)
+
+            const data = await getData.send({
+                from: this._wallet.account.address,
+                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                bounce: true
+            })
+
+            // data.
+
+            // const data = await getData.call()
+
+            console.log('createRound', data)
+            return true
+        } catch (error) {
+            console.log('createRound', error)
+            return undefined
+        }
+    }
+
+    public async joinRound (address: Address, roundId: string): Promise<true | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            console.log('joinRound not start', this._wallet)
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.joinRound({ answerId: 0, roundId } as never)
+
+            const data = await getData.send({
+                from: this._wallet.account.address,
+                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                bounce: true
+            })
+
+            // data.
+
+            // const data = await getData.call()
+
+            console.log('joinRound', data)
+            return true
+        } catch (error) {
+            console.log('joinRound', error)
+            return undefined
+        }
+    }
+
     public async getAllInfoGames (addresses: Address[]): Promise<InfoGames[] | undefined> {
         const allInfo = []
         const allRounds = []
+        const allseed = []
+        const allowner = []
 
         for (let i = 0; i < addresses.length; i++) {
             allInfo.push(this.getInfoForGames(addresses[i]))
             allRounds.push(this.getRounds(addresses[i]))
+            allseed.push(this.getSeed(addresses[i]))
+            allowner.push(this.getOwner(addresses[i]))
         }
-        const infos = await Promise.all(allInfo)
-        const rounds = await Promise.all(allRounds)
+
+        const allPromise = [
+            Promise.all(allInfo),
+            Promise.all(allRounds),
+            Promise.all(allseed),
+            Promise.all(allowner)
+        ]
+        const allPromiseData = await Promise.all(allPromise)
+        const infos = allPromiseData[0] as (InfoGame | undefined)[]
+        const rounds = allPromiseData[1] as (Rounds | undefined)[]
+        const seeds = allPromiseData[2] as (Seed | undefined)[]
+        const owners = allPromiseData[3] as (Owner | undefined)[]
+        // const infos = await Promise.all(allInfo)
+        // const rounds = await Promise.all(allRounds)
+        // const seeds = await Promise.all(allseed)
+        // const owners = await Promise.all(allowner)
 
         const data: InfoGames[] = []
         for (let i = 0; i < infos.length; i++) {
             data.push({
                 info: infos[i],
                 rounds: rounds[i],
-                address: addresses[i]
+                address: addresses[i],
+                seed: seeds[i]?.seed ?? '',
+                owner: owners[i]?.value0.toString() ?? ''
             })
         }
 

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import './style.css'
+import { Address } from 'everscale-inpage-provider'
 import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
@@ -11,7 +12,6 @@ import { Game, InfoGames, ObjPixel } from '../../logic/game'
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
 import { EverWallet } from '../../logic/wallet/hook'
-import { Address } from 'everscale-inpage-provider'
 
 interface MainProps {
     id: string,
@@ -38,7 +38,6 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
         if (!info) return undefined
         setInfoGame(info[0])
 
-
         return true
     }
 
@@ -49,6 +48,10 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
             setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
         }
     }, [])
+
+    useEffect(() => {
+        if (game) game.sunc(props.everWallet)
+    }, [ props.everWallet ])
 
     useEffect(() => {
         if (address && game) {
@@ -76,69 +79,154 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                     <div>{addStr(address)}</div>
                 </div>
 
-                <div className="page-block">
-                    <div className="left-block">
-                        <div className="title-bar">
-                            <h3 className='raider-font'>Rounds</h3>
-
-                        </div>
-
-                        <div className="group-block">
-
-                        </div>
-
-                    </div>
-
-                    <div className="center-block">
-                        <div className="title-bar">
-                            <h3 className='raider-font'>Prize: 10 EVER</h3>
-                            <h3 className='raider-font'>Jackpot: 100.17 EVER</h3>
-
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
-                            <BoardBlock {...props} infoGame={infoGame} game={game} />
-                        </div>
-
-                    </div>
-
-                    <div className="right-block">
-                        <div className="title-bar">
-                            <h3 className='raider-font'>Settings</h3>
-
-                        </div>
-
-                        <div className="group-block">
-                            <div className="block-simple">
-                                <h5>Round configuration</h5>
-                                <div className="hr" />
-                                <div className="cell">
-                                    <span>Players per round</span>
-                                    <span>6</span>
-                                </div>
-                                <div className="cell">
-                                    <span>Round time</span>
-                                    <span>00:05:00</span>
-                                </div>
-                                <div className="cell">
-                                    <span>Move time</span>
-                                    <span>00:00:10</span>
-                                </div>
-                                <div className="cell">
-                                    <span>Rake rate, EVER</span>
-                                    <span>0.01</span>
-                                </div>
-                                <div className="cell">
-                                    <span>Bet rate, EVER</span>
-                                    <span>0</span>
-                                </div>
+                {game && address && infoGame
+                    ? <div className="page-block">
+                        <div className="left-block">
+                            <div className="title-bar">
+                                <h3 className='raider-font'>Rounds</h3>
 
                             </div>
+
+                            <div className="group-block">
+                                <table className="table-block">
+                                    <thead>
+                                        <tr>
+                                            <th>Round</th>
+                                            <th>Status</th>
+                                            <th>Players</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {infoGame.rounds?._rounds.map((r, key) => (
+                                            <tr
+                                                key={key}
+                                                onClick={() => history('/boards/' + address + '/' + r.id)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <td>{r.id}</td>
+                                                <td>{r.status === '0' ? 'Created' : 'Finished'}</td>
+                                                <td>{r.maxPlayers}</td>
+
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <div>
+                                <Button onClick={() => game.createRound(new Address(address))}>New round</Button>
+                            </div>
+
                         </div>
 
-                    </div>
+                        <div className="center-block">
+                            <div className="title-bar">
+                                <h3 className='raider-font'>Prize: 10 EVER</h3>
+                                <h3 className='raider-font'>Jackpot: 100.17 EVER</h3>
 
-                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
+                                <BoardBlock {...props} infoGame={infoGame} game={game} />
+                            </div>
+
+                        </div>
+
+                        <div className="right-block">
+                            <div className="title-bar">
+                                <h3 className='raider-font'>Settings</h3>
+
+                            </div>
+
+                            {infoGame && infoGame.info
+                                ? <div className="group-block">
+                                    <div className="block-simple">
+                                        <h5>Round configuration</h5>
+                                        <div className="hr" />
+                                        <div className="cell">
+                                            <span>Players per round</span>
+                                            <span>6</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Round time</span>
+                                            <span>00:05:00</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Move time</span>
+                                            <span>00:00:10</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Rake rate, EVER</span>
+                                            <span>0.01</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Bet rate, EVER</span>
+                                            <span>0</span>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="block-simple">
+                                        <h5>Prize fund</h5>
+                                        <div className="hr" />
+                                        <div className="cell">
+                                            <span>Prize per round, EVER</span>
+                                            <span>10</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Remaining balance, EVER</span>
+                                            <span>1 456</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Paid out, EVER</span>
+                                            <span>3 456</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Rake to jackpot</span>
+                                            <span>100%</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Jackpot balance, EVER</span>
+                                            <span>100.17</span>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="block-simple">
+                                        <h5>Board data</h5>
+                                        <div className="hr" />
+                                        <div className="cell">
+                                            <span>Address</span>
+                                            <span>{addStr(address)}</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Owner</span>
+                                            <span>{addStr(infoGame.owner)}</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Size</span>
+                                            <span>{infoGame.info._board.rows + 'x' + infoGame.info._board.columns}</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Read beams</span>
+                                            <span>{infoGame?.info?._redBeams.length}</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Blue beams</span>
+                                            <span>{infoGame.info._blueBeams.length}</span>
+                                        </div>
+                                        <div className="cell">
+                                            <span>Seed</span>
+                                            <span>{infoGame.seed}</span>
+                                        </div>
+
+                                    </div>
+                                </div> : null }
+
+                        </div>
+
+                    </div> : null }
 
             </Div>
         </Panel>
