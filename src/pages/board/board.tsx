@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-
+import { Address } from 'everscale-inpage-provider'
 import './style.css'
 import { Panel, Div, Button, Link } from '../../components'
 
@@ -16,7 +16,8 @@ interface MainProps {
     isMobile: boolean,
     everWallet: EverWallet,
     game: Game | undefined,
-    infoGame: InfoGames | undefined
+    infoGame: InfoGames | undefined,
+    playersNumber?: (readonly [Address, string])[] | undefined
 }
 
 export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
@@ -28,6 +29,37 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
 
     const { address } = useParams()
     const history = useNavigate()
+
+    function move (num: number, t: boolean = true) {
+        const indEl = document.querySelector('.pixel.numb-' + num + ' .line-2') ?? document.querySelector('.pixel.numb-' + num + ' .line-3')
+
+        // remove all active
+        const all2 = document.querySelectorAll('.board .active')
+        for (let i = 0; i < all2.length; i++) {
+            all2[i].classList.remove('active')
+        }
+
+        if (!indEl || t === false) {
+            return undefined
+        }
+        const ind = indEl.className.replace('line-2 id-', '').replace('line-3 id-', '')
+
+        const all = document.querySelectorAll('.line-2.id-' + ind)
+        const all3 = document.querySelectorAll('.line-3.id-' + ind)
+
+        for (let i = 0; i < all.length; i++) {
+            const ell = all[i].parentElement
+            if (!ell) return undefined
+            ell.classList.add('active')
+        }
+        for (let i = 0; i < all3.length; i++) {
+            const ell = all3[i].parentElement
+            if (!ell) return undefined
+            ell.classList.add('active')
+        }
+
+        return true
+    }
 
     useEffect(() => {
         if (!firstRender && props.infoGame && props.infoGame.info && address) {
@@ -59,15 +91,23 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                     <div key={key} className="line">
                         {x.map((y, key2) => (
                             <div key={key2} className={
-                                'pixel ' + y.type
-                            }>
+                                'pixel ' + y.type + ' numb-' + y.number
+                            } onMouseOver={() => move(y.number)} onMouseOut={() => move(y.number, false)}>
                                 {y.type === 'win' ? null : y.number}
+                                <div className="players">
+                                    {props.playersNumber ? props.playersNumber.filter(
+                                        p => (Number(p[1]) + 1) === Number(y.number)
+                                    ).map((p, key5) => (
+                                        <div key={key5} className={'player in-' + key5 }></div>
+                                    )) : null}
+                                </div>
                                 {
                                     portals.filter(p => p.portals[1].number === y.number).length > 0
                                         ? portals.filter(p => p.portals[1].number === y.number).map((portal, key3) => (
                                             <div
                                                 key={key3}
-                                                className="line-2"
+                                                // onMouseOver={() => move(portal.id)}
+                                                className={ 'line-2 id-' + portal.id}
                                                 style={{
                                                     width: ((portal.distance ?? 0) * 1) + 'px',
                                                     transform: 'rotate(' + portal.rotate + 'deg)'
@@ -78,7 +118,7 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                                         : portals.filter(p => p.portals[0].number === y.number).map((portal, key3) => (
                                             <div
                                                 key={key3}
-                                                className="line-3"
+                                                className={ 'line-3 id-' + portal.id}
                                                 style={{
                                                     width: ((portal.distance ?? 0) * 1) + 'px',
                                                     transform: 'rotate(' + ((portal.rotate ?? 0) + 180) + 'deg)'

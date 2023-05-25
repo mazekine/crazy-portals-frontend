@@ -3,10 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import './style.css'
 import { Address } from 'everscale-inpage-provider'
+import moment from 'moment'
 import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
-import { addStr } from '../../logic/utils'
+import { addStr, toH, weiToEth } from '../../logic/utils'
 import { Game, InfoGames, ObjPixel } from '../../logic/game'
 
 import { BoardBlock } from './board'
@@ -112,26 +113,32 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                     </tbody>
                                 </table>
 
-                            </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginTop: '16px'
+                                }}>
+                                    <Button onClick={() => game.createRound(new Address(address))}>New round</Button>
+                                </div>
 
-                            <div>
-                                <Button onClick={() => game.createRound(new Address(address))}>New round</Button>
                             </div>
 
                         </div>
 
-                        <div className="center-block">
-                            <div className="title-bar">
-                                <h3 className='raider-font'>Prize: 10 EVER</h3>
-                                <h3 className='raider-font'>Jackpot: 100.17 EVER</h3>
+                        {infoGame && infoGame.rounds
+                            ? <div className="center-block">
+                                <div className="title-bar">
+                                    <h3 className='raider-font'>Prize: {weiToEth(infoGame.rounds._rounds[0].prizeFund, 9)} EVER</h3>
+                                    <h3 className='raider-font'>Jackpot: 100.17 EVER</h3>
 
-                            </div>
+                                </div>
 
-                            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
-                                <BoardBlock {...props} infoGame={infoGame} game={game} />
-                            </div>
+                                <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
+                                    <BoardBlock {...props} infoGame={infoGame} game={game} />
+                                </div>
 
-                        </div>
+                            </div> : null }
 
                         <div className="right-block">
                             <div className="title-bar">
@@ -139,7 +146,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
 
                             </div>
 
-                            {infoGame && infoGame.info
+                            {infoGame && infoGame.info && infoGame.rounds
                                 ? <div className="group-block">
                                     <div className="block-simple">
                                         <h5>Round configuration</h5>
@@ -150,19 +157,19 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         </div>
                                         <div className="cell">
                                             <span>Round time</span>
-                                            <span>00:05:00</span>
+                                            <span>{toH(Number(infoGame.rounds._rounds[0].roundDuration))}</span>
                                         </div>
                                         <div className="cell">
                                             <span>Move time</span>
-                                            <span>00:00:10</span>
+                                            <span>{toH(Number(infoGame.rounds._rounds[0].moveDuration))}</span>
                                         </div>
                                         <div className="cell">
                                             <span>Rake rate, EVER</span>
-                                            <span>0.01</span>
+                                            <span>{weiToEth(infoGame.rounds._rounds[0].rake, 9)}</span>
                                         </div>
                                         <div className="cell">
                                             <span>Bet rate, EVER</span>
-                                            <span>0</span>
+                                            <span>{weiToEth(infoGame.rounds._rounds[0].entryStake, 9)}</span>
                                         </div>
 
                                     </div>
@@ -172,7 +179,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         <div className="hr" />
                                         <div className="cell">
                                             <span>Prize per round, EVER</span>
-                                            <span>10</span>
+                                            <span>{weiToEth(infoGame.rounds._rounds[0].prizeFund, 9)}</span>
                                         </div>
                                         <div className="cell">
                                             <span>Remaining balance, EVER</span>
@@ -184,7 +191,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         </div>
                                         <div className="cell">
                                             <span>Rake to jackpot</span>
-                                            <span>100%</span>
+                                            <span>{infoGame.rounds._rounds[0].rakeToJackpotRate}%</span>
                                         </div>
                                         <div className="cell">
                                             <span>Jackpot balance, EVER</span>

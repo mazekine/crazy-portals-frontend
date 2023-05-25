@@ -26,6 +26,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
 
+    const  [ playersNumber, setPlayersNumber ] = React.useState<(readonly [Address, string])[] | undefined>(undefined)
+
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
 
     const { address, round } = useParams()
@@ -37,6 +39,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
         if (!info) return undefined
         setInfoGame(info[0])
+
+        const players = await game.getPlayerCell(list[0])
+        setPlayersNumber(players)
+        game.getPlayerRound(list[0])
 
         return true
     }
@@ -81,51 +87,54 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     <div>{round}</div>
                 </div>
 
-                {game && address && infoGame && round
+                {game && address && infoGame && round && playersNumber
                     ? <div className="page-block">
                         <div className="left-block">
                             <div className="title-bar">
-                                <h3 className='raider-font'>Rounds</h3>
+                                <h3 className='raider-font'>Actions</h3>
 
                             </div>
 
                             <div className="group-block">
-                                {infoGame.rounds?._rounds.map((r, key) => (
-                                    <div className="cell" key={key}>{r.id}</div>
-                                ))}
+                                <div className="cell">Anonymous capybara rolled moves 3 steps</div>
 
-                            </div>
-
-                            <div>
-                                <Button onClick={() => game.createRound(new Address(address))}>New round</Button>
                             </div>
 
                         </div>
 
                         <div className="center-block">
                             <div className="title-bar">
-                                <h3 className='raider-font'>Prize: 10 EVER</h3>
-                                <h3 className='raider-font'>Jackpot: 100.17 EVER</h3>
+                                <h3 className='raider-font'>Prize: 10</h3>
+                                <h3 className='raider-font'>Jackpot: 100.17</h3>
 
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
-                                <BoardBlock {...props} infoGame={infoGame} game={game} />
+                                <BoardBlock {...props} infoGame={infoGame} game={game} playersNumber={playersNumber} />
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '40px' }}>
+                                {playersNumber.map((p, key) => (
+                                    <div className="player-block" key={key}>
+                                        <div className={'player in-' + key}></div>
+                                        <div>{addStr(p[0].toString())}</div>
+                                    </div>
+                                ))}
+
                             </div>
 
                         </div>
 
                         <div className="right-block">
                             <div className="title-bar">
-                                <h3 className='raider-font'>Settings</h3>
+                                <h3 className='raider-font'></h3>
 
                             </div>
 
-                            <div >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
                                 <Button onClick={() => game.joinRound(new Address(address), round)}>Join</Button>
+                                <Button onClick={() => game.startRoll(new Address(address))}>Roll</Button>
                             </div>
-
-                            
 
                         </div>
 

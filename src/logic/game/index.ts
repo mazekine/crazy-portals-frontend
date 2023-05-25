@@ -4,7 +4,12 @@ import BigNumber from 'bignumber.js'
 import { EverWallet } from '../wallet/hook'
 import { useEverWallet } from '../wallet/useEverWallet'
 
-import * as abi from '../../Game.abi.json'
+import { gameAbi as abi } from './abi'
+import axios from 'axios'
+
+// import * as abi from '../../Game.abi.json'
+
+// const gameAbi = abi
 
 /* eslint-disable @typescript-eslint/naming-convention */
 interface ParamConstruct {
@@ -61,7 +66,12 @@ interface Round {
     entryStake: string,
     prizeFund: string,
     prizeClaimed: boolean,
-    winner: Address
+    winner: Address,
+    giveUpAllowed: boolean,
+    roundDuration: string,
+    autoStartTimestamp: string | undefined | null,
+    rake: string,
+    rakeToJackpotRate: string
 }
 
 interface Seed {
@@ -285,8 +295,12 @@ class Game {
 
     public async getAllGames (): Promise<Address[] | undefined> {
         if (!this._wallet.provider) return undefined
+
+        const codeHash = await axios.get('https://cpapi.mazekine.com/contractHash')
+        console.log(codeHash)
+        if (!codeHash.data) return undefined
         const addresses = await this._wallet.provider
-            .getAccountsByCodeHash({ codeHash: '420707736665c98b182d54d70269026947acb31781d8e6d279d366a1653d1949' })
+            .getAccountsByCodeHash({ codeHash: codeHash.data })
 
         console.log('addresses.accounts', addresses.accounts)
         return addresses.accounts
@@ -435,6 +449,66 @@ class Game {
             return true
         } catch (error) {
             console.log('joinRound', error)
+            return undefined
+        }
+    }
+
+    public async startRoll (address: Address): Promise<true | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.roll({ answerId: 0 } as never)
+
+            const data = await getData.send({
+                from: this._wallet.account.address,
+                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                bounce: true
+            })
+
+            console.log('startRoll', data)
+            return true
+        } catch (error) {
+            console.log('startRoll', error)
+            return undefined
+        }
+    }
+
+    public async getPlayerCell (address: Address): Promise<(readonly [Address, string])[] | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const data = await contractGame.fields.playerCell()
+
+            console.log('getPlayerCell', data)
+            return data
+        } catch (error) {
+            console.log('getPlayerCell', error)
+            return undefined
+        }
+    }
+
+    public async getPlayerRound (address: Address): Promise<(readonly [Address, string])[] | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const data = await contractGame.fields.playerRound()
+
+            console.log('getPlayerRound', data)
+            return data
+        } catch (error) {
+            console.log('getPlayerRound', error)
             return undefined
         }
     }
