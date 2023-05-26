@@ -20,7 +20,8 @@ interface MainProps {
     isDesktop: boolean,
     widthDesktop: number,
     isMobile: boolean,
-    everWallet: EverWallet
+    everWallet: EverWallet,
+    openModal: Function
 }
 
 export const Boards: React.FC<MainProps> = (props: MainProps) => {

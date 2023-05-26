@@ -24,6 +24,8 @@ export const App: React.FC = () => {
 
     const [ isMobile, setIsMobile ] = React.useState<boolean>(window.innerWidth <= widthMobile)
 
+    const [ modal, setModal ] = React.useState<any | undefined>(undefined)
+
     const everWallet = useEverWallet()
 
     const location = useLocation()
@@ -31,6 +33,18 @@ export const App: React.FC = () => {
     const history = useNavigate()
 
     // const provider = new Wallet()
+
+    function openModal (type: 'load' | 'close') {
+        if (type === 'load') {
+            setModal(<div className="modal">
+                <div className="loadModal">
+                    <h3>Wait transaction</h3>
+                </div>
+            </div>)
+        } else if (type === 'close') {
+            setModal(undefined)
+        }
+    }
 
     useEffect(() => {
         if (!firstRender) {
@@ -59,6 +73,7 @@ export const App: React.FC = () => {
                 // provider={provider}
             />}
             footer={<FooterBlock isDesktop={isDesktop} widthDesktop={widthDesktop} isMobile={isMobile} />}
+            modal={modal}
         >
             <View
                 id="main"
@@ -82,6 +97,7 @@ export const App: React.FC = () => {
                             widthDesktop={widthDesktop}
                             isMobile={isMobile}
                             everWallet={everWallet}
+                            openModal={openModal}
                         />
                     }/>
 
@@ -92,6 +108,7 @@ export const App: React.FC = () => {
                             widthDesktop={widthDesktop}
                             isMobile={isMobile}
                             everWallet={everWallet}
+                            openModal={openModal}
                         />
                     }/>
                     <Route path="/boards/:address/:round" element={
@@ -101,6 +118,7 @@ export const App: React.FC = () => {
                             widthDesktop={widthDesktop}
                             isMobile={isMobile}
                             everWallet={everWallet}
+                            openModal={openModal}
                         />
                     }/>
                 </Routes>

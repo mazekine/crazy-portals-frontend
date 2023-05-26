@@ -6,7 +6,7 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr } from '../../logic/utils'
-import { Game, InfoGames, ObjPixel, Portal } from '../../logic/game'
+import { Game, InfoGames, ObjPixel, Player, Portal } from '../../logic/game'
 import { EverWallet } from '../../logic/wallet/hook'
 
 interface MainProps {
@@ -17,7 +17,8 @@ interface MainProps {
     everWallet: EverWallet,
     game: Game | undefined,
     infoGame: InfoGames | undefined,
-    playersNumber?: (readonly [Address, string])[] | undefined
+    playersRound?: Player[] | undefined,
+    openModal: Function,
 }
 
 export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
@@ -95,8 +96,8 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                             } onMouseOver={() => move(y.number)} onMouseOut={() => move(y.number, false)}>
                                 {y.type === 'win' ? null : y.number}
                                 <div className="players">
-                                    {props.playersNumber ? props.playersNumber.filter(
-                                        p => (Number(p[1]) + 1) === Number(y.number)
+                                    {props.playersRound ? props.playersRound.filter(
+                                        p => (p.number + 1) === y.number
                                     ).map((p, key5) => (
                                         <div key={key5} className={'player in-' + key5 }></div>
                                     )) : null}

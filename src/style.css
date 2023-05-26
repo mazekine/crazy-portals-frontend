@@ -64,3 +64,21 @@ body {
 .nav-bar > * {
     margin-right: 10px;
 }
+
+.modal {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.274);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loadModal {
+    width: 300px;
+    min-height: 200px;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: 16px;
+    background-color: #fff;
+}

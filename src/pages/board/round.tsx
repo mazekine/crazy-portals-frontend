@@ -7,7 +7,7 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr } from '../../logic/utils'
-import { Game, InfoGames, ObjPixel } from '../../logic/game'
+import { Game, InfoGames, ObjPixel, Player } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -18,7 +18,8 @@ interface MainProps {
     isDesktop: boolean,
     widthDesktop: number,
     isMobile: boolean,
-    everWallet: EverWallet
+    everWallet: EverWallet,
+    openModal: Function
 }
 
 export const Round: React.FC<MainProps> = (props: MainProps) => {
@@ -26,9 +27,9 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
 
-    const  [ playersNumber, setPlayersNumber ] = React.useState<(readonly [Address, string])[] | undefined>(undefined)
-
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
+
+    const  [ playersRound2, setPlayersRound2 ] = React.useState<Player[] | undefined>(undefined)
 
     const { address, round } = useParams()
     const history = useNavigate()
@@ -40,10 +41,36 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         if (!info) return undefined
         setInfoGame(info[0])
 
-        const players = await game.getPlayerCell(list[0])
-        setPlayersNumber(players)
-        game.getPlayerRound(list[0])
+        // const players = await game.getPlayerCell(list[0])
+        // setPlayersNumber(players)
+        // game.getPlayerRound(list[0])
 
+        // const players2 = await game.getRoundsPlayers(list[0])
+
+        // setPlayersRound(players2)
+
+        const players3 = await game.getPlayersForRound(list[0], round ?? '')
+
+        setPlayersRound2(players3)
+
+        return true
+    }
+
+    async function joinRound () {
+        if (!game || !address || !round) return undefined
+        props.openModal('load')
+        const data = await game.joinRound(new Address(address), round)
+
+        props.openModal('close')
+        return true
+    }
+
+    async function startRoll () {
+        if (!game || !address) return undefined
+        props.openModal('load')
+        const data = await game.startRoll(new Address(address))
+
+        props.openModal('close')
         return true
     }
 
@@ -87,7 +114,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     <div>{round}</div>
                 </div>
 
-                {game && address && infoGame && round && playersNumber
+                {game && address && infoGame && round && playersRound2
                     ? <div className="page-block">
                         <div className="left-block">
                             <div className="title-bar">
@@ -110,14 +137,19 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center' }}>
-                                <BoardBlock {...props} infoGame={infoGame} game={game} playersNumber={playersNumber} />
+                                <BoardBlock
+                                    {...props}
+                                    infoGame={infoGame}
+                                    game={game}
+                                    playersRound={playersRound2}
+                                />
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '40px' }}>
-                                {playersNumber.map((p, key) => (
+                                {playersRound2.map((p, key) => (
                                     <div className="player-block" key={key}>
                                         <div className={'player in-' + key}></div>
-                                        <div>{addStr(p[0].toString())}</div>
+                                        <div>{addStr(p.address.toString())}</div>
                                     </div>
                                 ))}
 
@@ -132,8 +164,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
-                                <Button onClick={() => game.joinRound(new Address(address), round)}>Join</Button>
-                                <Button onClick={() => game.startRoll(new Address(address))}>Roll</Button>
+                                <Button onClick={() => joinRound()}>Join</Button>
+                                <Button onClick={() => startRoll()}>Roll</Button>
                             </div>
 
                         </div>

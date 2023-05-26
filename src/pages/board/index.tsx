@@ -19,7 +19,8 @@ interface MainProps {
     isDesktop: boolean,
     widthDesktop: number,
     isMobile: boolean,
-    everWallet: EverWallet
+    everWallet: EverWallet,
+    openModal: Function
 }
 
 export const Board: React.FC<MainProps> = (props: MainProps) => {
@@ -28,6 +29,8 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
     const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
 
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
+
+    const  [ playersRound, setPlayersRound ] = React.useState<(readonly [string, Address[]])[] | undefined>(undefined)
 
     const { address } = useParams()
     const history = useNavigate()
@@ -39,6 +42,19 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
         if (!info) return undefined
         setInfoGame(info[0])
 
+        const players = await game.getRoundsPlayers(list[0])
+
+        setPlayersRound(players)
+
+        return true
+    }
+
+    async function newRound () {
+        if (!game || !address) return undefined
+        props.openModal('load')
+        const data = await game.createRound(new Address(address))
+
+        props.openModal('close')
         return true
     }
 
@@ -80,7 +96,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                     <div>{addStr(address)}</div>
                 </div>
 
-                {game && address && infoGame
+                {game && address && infoGame && playersRound
                     ? <div className="page-block">
                         <div className="left-block">
                             <div className="title-bar">
@@ -105,8 +121,18 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <td>{r.id}</td>
-                                                <td>{r.status === '0' ? 'Created' : 'Finished'}</td>
-                                                <td>{r.maxPlayers}</td>
+                                                {/* NotStarted, Ready, Active, Finished, Expired */}
+                                                <td>
+                                                    {r.status === '0' ? 'Created' : null}
+                                                    {r.status === '1' ? 'Ready' : null}
+                                                    {r.status === '2' ? 'Active' : null}
+                                                    {r.status === '3' ? 'Finished' : null}
+                                                    {r.status === '4' ? 'Expired' : null}
+                                                </td>
+                                                <td>{
+                                                    playersRound.filter(r1 => r1[0] === r.id).map(r2 => (
+                                                        <span>{r2[1].length}</span>))
+                                                }</td>
 
                                             </tr>
                                         ))}
@@ -119,7 +145,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                     justifyContent: 'center',
                                     marginTop: '16px'
                                 }}>
-                                    <Button onClick={() => game.createRound(new Address(address))}>New round</Button>
+                                    <Button onClick={() => newRound()}>New round</Button>
                                 </div>
 
                             </div>

@@ -5,7 +5,8 @@ import './style.css'
 interface MainProps {
     children: any,
     header?: any,
-    footer?: any
+    footer?: any,
+    modal?: any
 }
 
 export const AppRoot: React.FC<MainProps> = (props: MainProps) => {
@@ -24,6 +25,9 @@ export const AppRoot: React.FC<MainProps> = (props: MainProps) => {
                 {props.children}
             </div>
             {props.footer}
+            {props.modal ? <div className='modal-root'>
+                {props.modal}
+            </div> : null}
         </div>
     )
 }

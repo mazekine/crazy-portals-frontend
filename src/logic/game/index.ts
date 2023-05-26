@@ -1,11 +1,11 @@
 import { Address } from 'everscale-inpage-provider'
 import { Wallet } from 'logic/wallet'
 import BigNumber from 'bignumber.js'
+import axios from 'axios'
 import { EverWallet } from '../wallet/hook'
 import { useEverWallet } from '../wallet/useEverWallet'
 
 import { gameAbi as abi } from './abi'
-import axios from 'axios'
 
 // import * as abi from '../../Game.abi.json'
 
@@ -97,6 +97,11 @@ export interface InfoGames {
     seed: string,
     owner: string
 
+}
+
+export interface Player {
+    address: Address,
+    number: number
 }
 
 // const portals: Portal[] = [
@@ -491,6 +496,61 @@ class Game {
             return data
         } catch (error) {
             console.log('getPlayerCell', error)
+            return undefined
+        }
+    }
+
+    public async getPlayersForRound (address: Address, id: string): Promise<Player[] | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            return undefined
+        }
+
+        const plR = await this.getRoundsPlayers(address)
+        const plC = await this.getPlayerCell(address)
+
+        if (!plR || !plC) return undefined
+
+        const players: Player[] = []
+
+        try {
+            const findRound = plR.filter(pl => pl[0] === id)
+
+            let usersForRound: Address[] = []
+            if (findRound.length !== 0) usersForRound = findRound[0][1]
+
+            for (let i = 0; i < usersForRound.length; i++) {
+                const numberPlayer = plC.filter(pl => pl[0].toString() === usersForRound[i].toString())
+                if (numberPlayer.length === 0) break
+
+                const player: Player = {
+                    address: usersForRound[i],
+                    number: Number(numberPlayer[0][1])
+                }
+
+                players.push(player)
+            }
+
+            return players
+        } catch (error) {
+            console.log('getPlayersForRound', error)
+            return undefined
+        }
+    }
+
+    public async getRoundsPlayers (address: Address): Promise<(readonly [string, Address[]])[] | undefined> {
+        if (!this._wallet.provider || !this._wallet.account) {
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const data = await contractGame.fields.roundPlayers()
+
+            console.log('getRoundsPlayers', data)
+            return data
+        } catch (error) {
+            console.log('getRoundsPlayers', error)
             return undefined
         }
     }

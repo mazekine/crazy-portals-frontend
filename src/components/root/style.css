@@ -21,3 +21,10 @@
     padding-top: var(--height_header);
     min-height: calc(100vh - var(--height_header) - 333px - 2px);
 }
+
+.modal-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+}
