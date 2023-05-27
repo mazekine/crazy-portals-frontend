@@ -1,4 +1,4 @@
-import { Address } from 'everscale-inpage-provider'
+import { AbiEventName, Address, Contract, DecodedEventWithTransaction } from 'everscale-inpage-provider'
 import { Wallet } from 'logic/wallet'
 import BigNumber from 'bignumber.js'
 import axios from 'axios'
@@ -103,6 +103,14 @@ export interface Player {
     address: Address,
     number: number
 }
+
+export type ContractType = Contract<typeof abi>
+export type ContractEvents = 'RoundCreated'
+| 'RoundFinished'
+| 'RoundJoined'
+| 'PlayerMoved'
+| 'PlayerWon'
+| 'PlayerRemovedFromRound'
 
 // const portals: Portal[] = [
 //     {
@@ -614,6 +622,29 @@ class Game {
         }
 
         return data
+    }
+
+    public onEvents (address: Address, cb: Function): true | undefined {
+        if (!this._wallet.provider || !this._wallet.account) {
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const subscriber = contractGame.events(new this._wallet.provider!.Subscriber())
+
+            subscriber.on((event) => {
+                cb(event.event, event.data)
+                console.log('Event: ', event)
+            })
+
+            console.log('onEvents', subscriber)
+            return true
+        } catch (error) {
+            console.log('onEvents', error)
+            return undefined
+        }
     }
 }
 

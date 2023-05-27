@@ -149,7 +149,7 @@
 }
 
 .board .pixel:hover {
-    z-index: 100;
+    z-index: 10;
 }
 
 .board .pixel:hover .line-2,

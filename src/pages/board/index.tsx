@@ -8,7 +8,7 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr, toH, weiToEth } from '../../logic/utils'
-import { Game, InfoGames, ObjPixel } from '../../logic/game'
+import { ContractEvents, ContractType, Game, InfoGames, ObjPixel } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -35,6 +35,15 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
     const { address } = useParams()
     const history = useNavigate()
 
+    async function getRounds (address1: Address) {
+        if (!game) return undefined
+        const players = await game.getRoundsPlayers(address1)
+
+        setPlayersRound(players)
+
+        return true
+    }
+
     async function getInfo (list: Address[]) {
         if (!game) return undefined
         const info = await game.getAllInfoGames(list)
@@ -42,9 +51,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
         if (!info) return undefined
         setInfoGame(info[0])
 
-        const players = await game.getRoundsPlayers(list[0])
-
-        setPlayersRound(players)
+        getRounds(list[0])
 
         return true
     }
@@ -72,7 +79,16 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
 
     useEffect(() => {
         if (address && game) {
-            getInfo([ new Address(address) ])
+            const addr = new Address(address)
+            getInfo([ addr ])
+
+            game.onEvents(addr, (ev: ContractEvents) => {
+                if (ev === 'RoundCreated' || ev === 'RoundFinished' || ev === 'RoundJoined') {
+                    setTimeout(()=>{
+                        getRounds(addr)
+                    }, 500)
+                }
+            })
         }
     }, [ address, game ])
 

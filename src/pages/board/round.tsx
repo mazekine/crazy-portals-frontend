@@ -7,7 +7,7 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr } from '../../logic/utils'
-import { Game, InfoGames, ObjPixel, Player } from '../../logic/game'
+import { ContractEvents, Game, InfoGames, ObjPixel, Player } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -34,6 +34,14 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     const { address, round } = useParams()
     const history = useNavigate()
 
+    async function getPlayers (address1: Address) {
+        if (!game) return undefined
+        const players3 = await game.getPlayersForRound(address1, round ?? '')
+
+        setPlayersRound2(players3)
+        return true
+    }
+
     async function getInfo (list: Address[]) {
         if (!game) return undefined
         const info = await game.getAllInfoGames(list)
@@ -49,9 +57,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
         // setPlayersRound(players2)
 
-        const players3 = await game.getPlayersForRound(list[0], round ?? '')
-
-        setPlayersRound2(players3)
+        getPlayers(list[0])
 
         return true
     }
@@ -87,10 +93,28 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.everWallet ])
 
     useEffect(() => {
-        if (address && game) {
-            getInfo([ new Address(address) ])
+        if (address && game && round) {
+            const addr = new Address(address)
+
+            getInfo([ addr ])
+
+            game.onEvents(addr, (ev: ContractEvents, data: any) => {
+                if (ev === 'PlayerMoved' || ev === 'PlayerRemovedFromRound' || ev === 'RoundFinished' || ev === 'RoundJoined') {
+                    if (data.round === round) {
+                        setTimeout(() => {
+                            getPlayers(addr)
+                        }, 500)
+                    }
+                }
+
+                if (ev === 'RoundFinished') {
+                    if (data.round === round) {
+                        console.log('Finish!!!')
+                    }
+                }
+            })
         }
-    }, [ address, game ])
+    }, [ address, game, round ])
 
     useEffect(() => {
         if (address && round) {
