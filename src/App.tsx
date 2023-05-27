@@ -12,6 +12,7 @@ import { Boards } from './pages/boards'
 import { Board } from './pages/board'
 import { Round } from './pages/board/round'
 import { useEverWallet } from './logic/wallet/useEverWallet'
+import { Game } from './logic/game'
 
 const widthDesktop = 1160
 

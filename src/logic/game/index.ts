@@ -158,10 +158,13 @@ class Game {
         this._address = params.address
         this._addressUser = params.addressUser
         this._wallet = params.wallet
+
+        console.log('_wallet', this._wallet)
     }
 
     public sunc (wallet: EverWallet): true {
         this._wallet = wallet
+        console.log('_wallet', this._wallet)
         return true
     }
 
@@ -310,7 +313,7 @@ class Game {
         if (!this._wallet.provider) return undefined
 
         const codeHash = await axios.get('https://cpapi.mazekine.com/contractHash')
-        console.log(codeHash)
+        console.log('codeHash', codeHash)
         if (!codeHash.data) return undefined
         const addresses = await this._wallet.provider
             .getAccountsByCodeHash({ codeHash: codeHash.data })
@@ -491,7 +494,7 @@ class Game {
     }
 
     public async getPlayerCell (address: Address): Promise<(readonly [Address, string])[] | undefined> {
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet.provider) {
             return undefined
         }
 
@@ -509,7 +512,7 @@ class Game {
     }
 
     public async getPlayersForRound (address: Address, id: string): Promise<Player[] | undefined> {
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet.provider) {
             return undefined
         }
 
@@ -546,7 +549,7 @@ class Game {
     }
 
     public async getRoundsPlayers (address: Address): Promise<(readonly [string, Address[]])[] | undefined> {
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet.provider) {
             return undefined
         }
 
@@ -564,7 +567,7 @@ class Game {
     }
 
     public async getPlayerRound (address: Address): Promise<(readonly [Address, string])[] | undefined> {
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet.provider) {
             return undefined
         }
 
@@ -625,7 +628,7 @@ class Game {
     }
 
     public onEvents (address: Address, cb: Function): true | undefined {
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet.provider) {
             return undefined
         }
 
