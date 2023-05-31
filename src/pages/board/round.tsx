@@ -85,6 +85,13 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             setFirstRender(true)
 
             setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
+
+            const int = setInterval(() => {
+                console.log('update')
+                if (address) getPlayers(new Address(address))
+            }, 3000)
+
+            return () => clearInterval(int)
         }
     }, [])
 

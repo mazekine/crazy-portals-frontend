@@ -31,7 +31,7 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'setMaxRoundTimeMs',
+            name: 'setMaxRoundTimeSec',
             inputs: [
                 { name: 'ms', type: 'uint64' }
             ],
@@ -39,7 +39,7 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'setMaxMoveTimeMs',
+            name: 'setMaxMoveTimeSec',
             inputs: [
                 { name: 'ms', type: 'uint64' }
             ],
@@ -79,7 +79,7 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'setAutostartMs',
+            name: 'setAutostartSec',
             inputs: [
                 { name: 'ms', type: 'optional(uint64)' }
             ],
@@ -169,26 +169,7 @@ export const gameAbi = {
                 { name: 'status', type: 'optional(uint8)' }
             ],
             outputs: [
-                {
-                    components: [
-                        { name: 'id', type: 'uint64' },
-                        { name: 'status', type: 'uint8' },
-                        { name: 'winner', type: 'address' },
-                        { name: 'maxPlayers', type: 'uint16' },
-                        { name: 'giveUpAllowed', type: 'bool' },
-                        { name: 'validUntil', type: 'uint64' },
-                        { name: 'roundDuration', type: 'uint64' },
-                        { name: 'moveDuration', type: 'uint64' },
-                        { name: 'autoStartTimestamp', type: 'optional(uint64)' },
-                        { name: 'entryStake', type: 'uint128' },
-                        { name: 'prizeFund', type: 'uint128' },
-                        { name: 'prizeClaimed', type: 'bool' },
-                        { name: 'rake', type: 'uint128' },
-                        { name: 'rakeToJackpotRate', type: 'uint8' }
-                    ],
-                    name: '_rounds',
-                    type: 'tuple[]'
-                }
+                { components: [ { name: 'id', type: 'uint64' }, { name: 'status', type: 'uint8' }, { name: 'winner', type: 'address' }, { name: 'maxPlayers', type: 'uint16' }, { name: 'giveUpAllowed', type: 'bool' }, { name: 'validUntil', type: 'uint64' }, { name: 'roundDuration', type: 'uint64' }, { name: 'moveDuration', type: 'uint64' }, { name: 'autoStartTimestamp', type: 'optional(uint64)' }, { name: 'entryStake', type: 'uint128' }, { name: 'prizeFund', type: 'uint128' }, { name: 'prizeClaimed', type: 'bool' }, { name: 'rake', type: 'uint128' }, { name: 'rakeToJackpotRate', type: 'uint8' } ], name: '_rounds', type: 'tuple[]' }
             ]
         },
         {
@@ -299,19 +280,19 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'minJackpotProbability',
+            name: 'jackpotMinProbability',
             inputs: [
             ],
             outputs: [
-                { name: 'minJackpotProbability', type: 'uint64' }
+                { name: 'jackpotMinProbability', type: 'uint64' }
             ]
         },
         {
-            name: 'maxJackpotProbability',
+            name: 'jackpotMaxProbability',
             inputs: [
             ],
             outputs: [
-                { name: 'maxJackpotProbability', type: 'uint64' }
+                { name: 'jackpotMaxProbability', type: 'uint64' }
             ]
         },
         {
@@ -637,7 +618,7 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'MaxRoundTimeMsUpdated',
+            name: 'MaxRoundTimeSecUpdated',
             inputs: [
                 { name: 'board', type: 'address' },
                 { name: 'oldValue', type: 'uint64' },
@@ -647,7 +628,7 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'MaxMoveTimeMsUpdated',
+            name: 'MaxMoveTimeSecUpdated',
             inputs: [
                 { name: 'board', type: 'address' },
                 { name: 'oldValue', type: 'uint64' },
@@ -657,7 +638,7 @@ export const gameAbi = {
             ]
         },
         {
-            name: 'RoundAutostartMsUpdated',
+            name: 'RoundAutostartSecUpdated',
             inputs: [
                 { name: 'board', type: 'address' },
                 { name: 'oldValue', type: 'optional(uint64)' },
@@ -728,8 +709,8 @@ export const gameAbi = {
         { name: '_initialized', type: 'bool' },
         { name: 'jackpotAveragedPeriods', type: 'uint16' },
         { name: 'jackpotProbabilityFreezePeriod', type: 'uint64' },
-        { name: 'minJackpotProbability', type: 'uint64' },
-        { name: 'maxJackpotProbability', type: 'uint64' },
+        { name: 'jackpotMinProbability', type: 'uint64' },
+        { name: 'jackpotMaxProbability', type: 'uint64' },
         { name: 'curJackpotProbability', type: 'uint64' },
         { name: 'jackpotWinningNumber', type: 'uint64' },
         { name: 'jackpotFreezeProbabilityUntil', type: 'uint64' },
