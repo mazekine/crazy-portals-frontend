@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import './style.css'
-import { Address } from 'everscale-inpage-provider'
+import { Address, ProviderRpcClient } from 'everscale-inpage-provider'
 import { Panel, Div, Button, Link, Icon } from '../../components'
 
 import chery from '../../img/chery.svg'
@@ -11,7 +11,7 @@ import sqad from '../../img/sqad.svg'
 import sqad2 from '../../img/sqad.svg'
 import portal from '../../img/portal.svg'
 import portal2 from '../../img/portal2.svg'
-import { Game, InfoGame, InfoGames } from '../../logic/game'
+import { Game, InfoGame, InfoGames, VenomWallet } from '../../logic/game'
 import { EverWallet } from '../../logic/wallet/hook'
 import { addStr } from '../../logic/utils'
 
@@ -21,7 +21,9 @@ interface MainProps {
     widthDesktop: number,
     isMobile: boolean,
     everWallet: EverWallet,
-    openModal: Function
+    openModal: Function,
+    venomWallet: VenomWallet | undefined,
+    typeNetwork: 'venom' | 'ever'
 }
 
 export const Boards: React.FC<MainProps> = (props: MainProps) => {
@@ -46,12 +48,16 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
     }
 
     useEffect(() => {
-        if (!firstRender) {
+        if (!firstRender
+            && (props.typeNetwork === 'venom' ? props.venomWallet?.provider && props.venomWallet?.account : props.everWallet)) {
             setFirstRender(true)
-
-            setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
+            setGame(new Game({
+                address: '',
+                addressUser: '',
+                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet
+            }))
         }
-    }, [])
+    }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
         if (game) {

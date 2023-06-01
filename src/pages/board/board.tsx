@@ -97,7 +97,7 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                                 {y.type === 'win' ? null : y.number}
                                 <div className="players">
                                     {props.playersRound ? props.playersRound.filter(
-                                        p => (p.number + 1) === y.number
+                                        p => (p.number) === y.number
                                     ).map((p, key5) => (
                                         <div key={key5} className={'player in-' + key5 }></div>
                                     )) : null}

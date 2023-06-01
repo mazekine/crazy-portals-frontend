@@ -1,4 +1,4 @@
-import { AbiEventName, Address, Contract, DecodedEventWithTransaction } from 'everscale-inpage-provider'
+import { AbiEventName, Address, Contract, DecodedEventWithTransaction, ProviderRpcClient } from 'everscale-inpage-provider'
 import { Wallet } from 'logic/wallet'
 import BigNumber from 'bignumber.js'
 import axios from 'axios'
@@ -12,10 +12,19 @@ import { gameAbi as abi } from './abi'
 // const gameAbi = abi
 
 /* eslint-disable @typescript-eslint/naming-convention */
+export interface VenomWallet {
+    provider: ProviderRpcClient,
+    address: string | undefined,
+    balance: string | undefined,
+    account: {
+        address: Address | undefined
+    },
+    type: 'venom' | 'ever'
+}
 interface ParamConstruct {
     address: string,
     addressUser: string,
-    wallet: EverWallet
+    wallet: EverWallet | VenomWallet | undefined
 }
 
 export interface ObjPixel {
@@ -152,7 +161,7 @@ class Game {
 
     private _addressUser: string
 
-    private _wallet: EverWallet
+    private _wallet: EverWallet | VenomWallet | undefined
 
     constructor (params: ParamConstruct) {
         this._address = params.address
@@ -162,7 +171,7 @@ class Game {
         console.log('_wallet', this._wallet)
     }
 
-    public sunc (wallet: EverWallet): true {
+    public sunc (wallet: EverWallet | VenomWallet | undefined): true {
         this._wallet = wallet
         console.log('_wallet', this._wallet)
         return true
@@ -310,19 +319,28 @@ class Game {
     }
 
     public async getAllGames (): Promise<Address[] | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
 
         const codeHash = await axios.get('https://cpapi.mazekine.com/contractHash')
         console.log('codeHash', codeHash)
         if (!codeHash.data) return undefined
-        const addresses = await this._wallet.provider
-            .getAccountsByCodeHash({ codeHash: codeHash.data })
+        try {
+            const addresses = await this._wallet.provider
+                .getAccountsByCodeHash({ codeHash: codeHash.data })
 
-        console.log('addresses.accounts', addresses.accounts)
-        return addresses.accounts
+            console.log('addresses.accounts', addresses.accounts)
+
+            console.log('Provider connect', this._wallet.provider)
+            return addresses.accounts
+        } catch (error) {
+            console.error(error)
+            return []
+        }
     }
 
     public async getRounds (address: Address): Promise<Rounds | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
@@ -340,6 +358,7 @@ class Game {
     }
 
     public async getInfoForGames (address: Address): Promise<InfoGame | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
@@ -358,6 +377,7 @@ class Game {
     }
 
     public async getSeed (address: Address): Promise<Seed | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
@@ -376,6 +396,7 @@ class Game {
     }
 
     public async getOwner (address: Address): Promise<Owner | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
@@ -394,6 +415,7 @@ class Game {
     }
 
     public async getPrizeFundPerRound (address: Address): Promise<PrizeFundPerRound | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
@@ -412,10 +434,12 @@ class Game {
     }
 
     public async createRound (address: Address): Promise<true | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider || !this._wallet.account) {
             console.log('createRound not start', this._wallet)
             return undefined
         }
+        if (!this._wallet.account.address) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
@@ -441,10 +465,14 @@ class Game {
     }
 
     public async joinRound (address: Address, roundId: string): Promise<true | undefined> {
+        if (!this._wallet) return undefined
+        if (!this._wallet.account) return undefined
+        if (!this._wallet.provider) return undefined
         if (!this._wallet.provider || !this._wallet.account) {
             console.log('joinRound not start', this._wallet)
             return undefined
         }
+        if (!this._wallet.account.address) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
@@ -470,7 +498,10 @@ class Game {
     }
 
     public async startRoll (address: Address): Promise<true | undefined> {
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet) return undefined
+        if (!this._wallet.account) return undefined
+        if (!this._wallet.provider) return undefined
+        if (!this._wallet.account.address) {
             return undefined
         }
 
@@ -494,6 +525,7 @@ class Game {
     }
 
     public async getPlayerCell (address: Address): Promise<(readonly [Address, string])[] | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) {
             return undefined
         }
@@ -512,6 +544,7 @@ class Game {
     }
 
     public async getPlayersForRound (address: Address, id: string): Promise<Player[] | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) {
             return undefined
         }
@@ -549,6 +582,7 @@ class Game {
     }
 
     public async getRoundsPlayers (address: Address): Promise<(readonly [string, Address[]])[] | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) {
             return undefined
         }
@@ -567,6 +601,7 @@ class Game {
     }
 
     public async getPlayerRound (address: Address): Promise<(readonly [Address, string])[] | undefined> {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) {
             return undefined
         }
@@ -628,6 +663,7 @@ class Game {
     }
 
     public onEvents (address: Address, cb: Function): true | undefined {
+        if (!this._wallet) return undefined
         if (!this._wallet.provider) {
             return undefined
         }
@@ -635,14 +671,14 @@ class Game {
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
         try {
-            const subscriber = contractGame.events(new this._wallet.provider!.Subscriber())
+            // const subscriber = contractGame.events(new this._wallet.provider!.Subscriber())
 
-            subscriber.on((event) => {
-                cb(event.event, event.data)
-                console.log('Event: ', event)
-            })
+            // subscriber.on((event) => {
+            //     cb(event.event, event.data)
+            //     console.log('Event: ', event)
+            // })
 
-            console.log('onEvents', subscriber)
+            // console.log('onEvents', subscriber)
             return true
         } catch (error) {
             console.log('onEvents', error)

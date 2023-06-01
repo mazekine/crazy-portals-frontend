@@ -8,7 +8,7 @@ import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr, toH, weiToEth } from '../../logic/utils'
-import { ContractEvents, ContractType, Game, InfoGames, ObjPixel } from '../../logic/game'
+import { ContractEvents, ContractType, Game, InfoGames, ObjPixel, VenomWallet } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -20,7 +20,9 @@ interface MainProps {
     widthDesktop: number,
     isMobile: boolean,
     everWallet: EverWallet,
-    openModal: Function
+    openModal: Function,
+    venomWallet: VenomWallet | undefined,
+    typeNetwork: 'venom' | 'ever'
 }
 
 export const Board: React.FC<MainProps> = (props: MainProps) => {
@@ -66,15 +68,19 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
     }
 
     useEffect(() => {
-        if (!firstRender) {
+        if (!firstRender
+            && (props.typeNetwork === 'venom' ? props.venomWallet?.provider && props.venomWallet?.account : props.everWallet)) {
             setFirstRender(true)
-
-            setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
+            setGame(new Game({
+                address: '',
+                addressUser: '',
+                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet
+            }))
         }
-    }, [])
+    }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
-        if (game) game.sunc(props.everWallet)
+        if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
     }, [ props.everWallet ])
 
     useEffect(() => {

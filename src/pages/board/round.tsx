@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import './style.css'
 import { Address } from 'everscale-inpage-provider'
+import moment from 'moment'
 import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
 import { addStr } from '../../logic/utils'
-import { ContractEvents, Game, InfoGames, ObjPixel, Player } from '../../logic/game'
+import { ContractEvents, Game, InfoGames, ObjPixel, Player, VenomWallet } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -19,13 +20,20 @@ interface MainProps {
     widthDesktop: number,
     isMobile: boolean,
     everWallet: EverWallet,
-    openModal: Function
+    openModal: Function,
+    venomWallet: VenomWallet | undefined,
+    typeNetwork: 'venom' | 'ever'
 }
 
 export const Round: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
+    const [ firstRender2, setFirstRender2 ] = React.useState<boolean>(false)
 
     const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
+
+    const  [ win, setWin ] = React.useState<number>(0) // 0 - no 1 - win 2 - jecpot
+
+    const  [ timer, setTimer ] = React.useState<string>('00:00')
 
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
 
@@ -33,6 +41,21 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     const { address, round } = useParams()
     const history = useNavigate()
+
+    function startTimer (date: number) {
+        const eventTime = date // Timestamp - Sun, 21 Apr 2013 13:00:00 GMT
+        const currentTime = Date.now() / 1000 // Timestamp - Sun, 21 Apr 2013 12:30:00 GMT
+        const diffTime = eventTime - currentTime
+        let duration = moment.duration(diffTime * 1000, 'milliseconds')
+        const interval = 1000
+
+        if (diffTime < 0) return
+
+        const interv = setInterval(() => {
+            duration = moment.duration(Number(duration) - interval, 'milliseconds')
+            setTimer(`${duration.minutes()}:${duration.seconds()}`)
+        }, interval)
+    }
 
     async function getPlayers (address1: Address) {
         if (!game) return undefined
@@ -59,6 +82,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
         getPlayers(list[0])
 
+        if (info[0] && info[0].rounds) {
+            startTimer(Number(info[0].rounds._rounds.filter(r => r.id === round)[0].validUntil))
+        }
+
         return true
     }
 
@@ -81,10 +108,20 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }
 
     useEffect(() => {
-        if (!firstRender) {
+        if (!firstRender
+            && (props.typeNetwork === 'venom' ? props.venomWallet?.provider && props.venomWallet?.account : props.everWallet)) {
             setFirstRender(true)
+            setGame(new Game({
+                address: '',
+                addressUser: '',
+                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet
+            }))
+        }
+    }, [ props.everWallet, props.venomWallet ])
 
-            setGame(new Game({ address: '', addressUser: '', wallet: props.everWallet }))
+    useEffect(() => {
+        if (!firstRender2) {
+            setFirstRender2(true)
 
             const int = setInterval(() => {
                 console.log('update')
@@ -96,7 +133,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [])
 
     useEffect(() => {
-        if (game) game.sunc(props.everWallet)
+        if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
     }, [ props.everWallet ])
 
     useEffect(() => {
@@ -145,7 +182,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     <div>{round}</div>
                 </div>
 
-                {game && address && infoGame && round && playersRound2
+                {game && address && infoGame && round && playersRound2 && win === 0 && infoGame.rounds
                     ? <div className="page-block">
                         <div className="left-block">
                             <div className="title-bar">
@@ -163,6 +200,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                         <div className="center-block">
                             <div className="title-bar">
                                 <h3 className='raider-font'>Prize: 10</h3>
+                                <h3 className='raider-font'>{timer}</h3>
                                 <h3 className='raider-font'>Jackpot: 100.17</h3>
 
                             </div>
@@ -202,6 +240,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                         </div>
 
                     </div> : null }
+
+                {win !== 0 ? <div className="page-block">
+
+                </div> : null}
 
             </Div>
         </Panel>

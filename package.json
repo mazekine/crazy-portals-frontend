@@ -42,7 +42,8 @@
         "react-router": "^6.4.3",
         "react-router-dom": "^6.4.3",
         "react-scripts": "5.0.1",
-        "stream-browserify": "^3.0.0"
+        "stream-browserify": "^3.0.0",
+        "venom-connect": "^1.0.20"
     },
     "devDependencies": {
         "@types/node": "^18.7.6",
