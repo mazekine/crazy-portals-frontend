@@ -5,6 +5,7 @@ import './style.css'
 import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
+import corona from '../../img/corona.svg'
 import { addStr } from '../../logic/utils'
 import { Game, InfoGames, ObjPixel, Player, Portal } from '../../logic/game'
 import { EverWallet } from '../../logic/wallet/hook'
@@ -94,12 +95,10 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                             <div key={key2} className={
                                 'pixel ' + y.type + ' numb-' + y.number
                             } onMouseOver={() => move(y.number)} onMouseOut={() => move(y.number, false)}>
-                                {y.type === 'win' ? null : y.number}
+                                {y.type === 'win' ? <img src={corona} /> : y.number}
                                 <div className="players">
-                                    {props.playersRound ? props.playersRound.filter(
-                                        p => (p.number) === y.number
-                                    ).map((p, key5) => (
-                                        <div key={key5} className={'player in-' + key5 }></div>
+                                    {props.playersRound ? props.playersRound.map((p, key5) => (
+                                        p.number === y.number ? <div key={key5} className={'player in-' + key5 }></div> : null
                                     )) : null}
                                 </div>
                                 {

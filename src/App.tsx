@@ -138,7 +138,7 @@ export const App: React.FC = () => {
         if (_provider && _address) {
             setTimeout(() => {
                 check(_provider)
-            }, 100)
+            }, 2000)
         }
     }
 

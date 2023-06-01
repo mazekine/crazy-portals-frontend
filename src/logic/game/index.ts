@@ -257,7 +257,9 @@ class Game {
                     p => p.portals[0].number === num || p.portals[1].number === num
                 )
 
-                const type = typePortal.length > 0 ? 'portal-' + typePortal[0].type : 'default'
+                let type = typePortal.length > 0 ? 'portal-' + typePortal[0].type : 'default'
+
+                
 
                 if (type !== 'default') {
                     const indexPortal = portals.findIndex(
@@ -269,6 +271,8 @@ class Game {
                     console.log((i % 2 ? size - i2 : i2 + 1) - 1, (size - i) - 1, localPortals[indexPortal])
                     localPortals[indexPortal].portals[numOfPortal].position = [ (i % 2 ? size - i2 : i2 + 1) - 1, (size - i) - 1 ] // x y
                 }
+
+                if (num === Max) type = 'win'
 
                 arrX.push({
                     number: num,
@@ -465,14 +469,10 @@ class Game {
     }
 
     public async joinRound (address: Address, roundId: string): Promise<true | undefined> {
-        if (!this._wallet) return undefined
-        if (!this._wallet.account) return undefined
-        if (!this._wallet.provider) return undefined
-        if (!this._wallet.provider || !this._wallet.account) {
+        if (!this._wallet || !this._wallet.provider || !this._wallet.account || !this._wallet.provider || !this._wallet.account.address) {
             console.log('joinRound not start', this._wallet)
             return undefined
         }
-        if (!this._wallet.account.address) return undefined
 
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
@@ -671,14 +671,14 @@ class Game {
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
         try {
-            // const subscriber = contractGame.events(new this._wallet.provider!.Subscriber())
+            const subscriber = contractGame.events(new this._wallet.provider!.Subscriber())
 
-            // subscriber.on((event) => {
-            //     cb(event.event, event.data)
-            //     console.log('Event: ', event)
-            // })
+            subscriber.on((event) => {
+                cb(event.event, event.data)
+                console.log('Event: ', event)
+            })
 
-            // console.log('onEvents', subscriber)
+            console.log('onEvents', subscriber)
             return true
         } catch (error) {
             console.log('onEvents', error)

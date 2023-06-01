@@ -81,7 +81,8 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
 
     useEffect(() => {
         if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
-    }, [ props.everWallet ])
+        if (game && props.typeNetwork === 'venom') game.sunc(props.venomWallet)
+    }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
         if (address && game) {
@@ -90,7 +91,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
 
             game.onEvents(addr, (ev: ContractEvents) => {
                 if (ev === 'RoundCreated' || ev === 'RoundFinished' || ev === 'RoundJoined') {
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         getRounds(addr)
                     }, 500)
                 }
@@ -136,7 +137,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {infoGame.rounds?._rounds.map((r, key) => (
+                                        {infoGame.rounds && [ ...infoGame.rounds._rounds ].reverse().map((r, key) => (
                                             <tr
                                                 key={key}
                                                 onClick={() => history('/boards/' + address + '/' + r.id)}
@@ -177,8 +178,9 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                         {infoGame && infoGame.rounds
                             ? <div className="center-block">
                                 <div className="title-bar">
-                                    <h3 className='raider-font'>Prize: {weiToEth(infoGame.rounds._rounds[0].prizeFund, 9)} EVER</h3>
-                                    <h3 className='raider-font'>Jackpot: 100.17 EVER</h3>
+                                    <h3 className='raider-font'>
+                                        Prize: {weiToEth(infoGame.rounds._rounds[0].prizeFund, 9)} {props.typeNetwork.toUpperCase()}</h3>
+                                    <h3 className='raider-font'>Jackpot: 100.17 {props.typeNetwork.toUpperCase()}</h3>
 
                                 </div>
 
@@ -212,11 +214,11 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                             <span>{toH(Number(infoGame.rounds._rounds[0].moveDuration))}</span>
                                         </div>
                                         <div className="cell">
-                                            <span>Rake rate, EVER</span>
+                                            <span>Rake rate, {props.typeNetwork.toUpperCase()}</span>
                                             <span>{weiToEth(infoGame.rounds._rounds[0].rake, 9)}</span>
                                         </div>
                                         <div className="cell">
-                                            <span>Bet rate, EVER</span>
+                                            <span>Bet rate, {props.typeNetwork.toUpperCase()}</span>
                                             <span>{weiToEth(infoGame.rounds._rounds[0].entryStake, 9)}</span>
                                         </div>
 
@@ -226,15 +228,15 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         <h5>Prize fund</h5>
                                         <div className="hr" />
                                         <div className="cell">
-                                            <span>Prize per round, EVER</span>
+                                            <span>Prize per round, {props.typeNetwork.toUpperCase()}</span>
                                             <span>{weiToEth(infoGame.rounds._rounds[0].prizeFund, 9)}</span>
                                         </div>
                                         <div className="cell">
-                                            <span>Remaining balance, EVER</span>
+                                            <span>Remaining balance, {props.typeNetwork.toUpperCase()}</span>
                                             <span>1 456</span>
                                         </div>
                                         <div className="cell">
-                                            <span>Paid out, EVER</span>
+                                            <span>Paid out, {props.typeNetwork.toUpperCase()}</span>
                                             <span>3 456</span>
                                         </div>
                                         <div className="cell">
@@ -242,7 +244,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                             <span>{infoGame.rounds._rounds[0].rakeToJackpotRate}%</span>
                                         </div>
                                         <div className="cell">
-                                            <span>Jackpot balance, EVER</span>
+                                            <span>Jackpot balance, {props.typeNetwork.toUpperCase()}</span>
                                             <span>100.17</span>
                                         </div>
 

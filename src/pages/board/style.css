@@ -140,7 +140,18 @@
 }
 
 .win {
+    border: 1px solid #0062AD!important;
+}
 
+.win:before {
+    content: '';
+    display: block;
+    position: absolute;
+    border: 1px solid #0062AD!important;
+    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+    box-sizing: border-box;
 }
 
 .board .pixel {
@@ -193,11 +204,18 @@
 .players {
     position: absolute;
     bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .player {
     width: 6px;
     height: 6px;
     border-radius: 50px;
+    margin-right: 4px;
+}
+.player:last-child {
+    margin-right: 0px;
 }
 .player.in-0 {
     background-color: #BB6BD9;
@@ -236,6 +254,7 @@
     border: 1px solid #CCDEFF;
     padding: 8px;
     cursor: pointer;
+    margin-right: 16px;
 }
 
 .player-block .player {

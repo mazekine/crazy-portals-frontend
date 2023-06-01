@@ -90,7 +90,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }
 
     async function joinRound () {
-        if (!game || !address || !round) return undefined
+        if (!game || !address || !round) {
+            console.error('joinRound null')
+            return undefined
+        }
         props.openModal('load')
         const data = await game.joinRound(new Address(address), round)
 
@@ -99,7 +102,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }
 
     async function startRoll () {
-        if (!game || !address) return undefined
+        if (!game || !address) {
+            console.error('startRoll null')
+            return undefined
+        }
         props.openModal('load')
         const data = await game.startRoll(new Address(address))
 
@@ -134,7 +140,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     useEffect(() => {
         if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
-    }, [ props.everWallet ])
+        if (game && props.typeNetwork === 'venom') game.sunc(props.venomWallet)
+    }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
         if (address && game && round) {
@@ -179,7 +186,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     <img src={chery} />
                     <Link onClick={() => history('/boards/' + address)}>{addStr(address)}</Link>
                     <img src={chery} />
-                    <div>{round}</div>
+                    <div>Round #{round}</div>
                 </div>
 
                 {game && address && infoGame && round && playersRound2 && win === 0 && infoGame.rounds
@@ -226,15 +233,33 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                         </div>
 
-                        <div className="right-block">
+                        <div className="right-block" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexDirection: 'column'
+                        }}>
                             <div className="title-bar">
                                 <h3 className='raider-font'></h3>
 
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
-                                <Button onClick={() => joinRound()}>Join</Button>
-                                <Button onClick={() => startRoll()}>Roll</Button>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '60%' }} >
+                                {/* {props.typeNetwork === 'venom' && props.venomWallet && props.venomWallet.address ?
+                                    playersRound2.findIndex(p => p.address.toString() === props.venomWallet.address) !== -1 ?
+                                    <Button onClick={() => startRoll()}>Roll</Button>
+                                : null} */}
+
+                                {playersRound2.findIndex(
+                                    p => p.address.toString() === (
+                                        props.typeNetwork === 'venom'
+                                            ? props.venomWallet?.address : props.everWallet.account?.address.toString()
+                                    )
+                                ) > -1
+                                    ? <Button onClick={() => startRoll()} stretched>Roll</Button>
+                                    : <Button onClick={() => joinRound()} stretched>Join</Button> }
+                                {/* <Button onClick={() => joinRound()}>Join</Button>
+                                <Button onClick={() => startRoll()}>Roll</Button> */}
                             </div>
 
                         </div>

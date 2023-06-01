@@ -92,7 +92,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
                         </div>
 
-                        <div className="group-block">
+                        <div className="group-block" style={{padding: 0}}>
                             <div className="header-block">
                                 <div className="map-block">
                                     <div style={{ padding: '0 0 20px 0', width: '100%' }}>
@@ -123,12 +123,12 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
                                 <div className="info-block">
                                     <div>
-                                        <h3>5 000<span>EVER</span></h3>
+                                        <h3>5 000<span>{props.typeNetwork.toUpperCase()}</span></h3>
                                         <div className="blue-text">remaining prize fund</div>
                                     </div>
 
                                     <div>
-                                        <h4>10<span>EVER</span></h4>
+                                        <h4>10<span>{props.typeNetwork.toUpperCase()}</span></h4>
                                         <div className="blue-text">prize per round</div>
                                     </div>
 
@@ -138,7 +138,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
                             </div>
 
-                            <div className="info-of-game">
+                            <div className="info-of-game"  style={{padding: '20px'}}>
                                 <div className="in-block">
 
                                 </div>
@@ -166,9 +166,9 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                                             <th>Size</th>
                                             <th>Portals</th>
                                             <th>Rounds</th>
-                                            <th>Prize per<br /> round, EVER</th>
-                                            <th>Winnings,<br /> EVER</th>
-                                            <th>Balance left,<br /> EVER</th>
+                                            <th>Prize per<br /> round, {props.typeNetwork.toUpperCase()}</th>
+                                            <th>Winnings,<br /> {props.typeNetwork.toUpperCase()}</th>
+                                            <th>Balance left,<br /> {props.typeNetwork.toUpperCase()}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
