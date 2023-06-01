@@ -65,7 +65,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                 if (games) setListGames(games)
             })
         }
-    }, [ game ])
+    }, [ game, props.venomWallet, props.everWallet ])
 
     useEffect(() => {
         if (listGames && game) {
