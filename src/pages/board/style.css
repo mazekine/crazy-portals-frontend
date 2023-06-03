@@ -250,7 +250,7 @@
     align-items: center;
     justify-content: space-between;
     border-radius: 100px;
-    background: #EEF4FF;
+    /* background: #EEF4FF; */
     border: 1px solid #CCDEFF;
     padding: 8px;
     cursor: pointer;
@@ -271,4 +271,8 @@
 
 .start_line > * {
     margin-right: 6px;
+}
+
+.player-block.you {
+    background-color: #EEF4FF;
 }

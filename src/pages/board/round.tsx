@@ -164,6 +164,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                 if (ev === 'RoundFinished') {
                     if (data.round === round) {
+                        setWin(1)
                         console.log('Finish!!!')
                     }
                 }
@@ -238,7 +239,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '20px' }}>
                                 {playersRound2.map((p, key) => (
-                                    <div className="player-block" key={key}>
+                                    <div className={'player-block'
+                                        + (p.address.toString() === props.venomWallet?.address ? ' you' : '')} key={key}>
                                         <div className={'player in-' + key}></div>
                                         <div>{addStr(p.address.toString())}</div>
                                     </div>
