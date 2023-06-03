@@ -13,7 +13,7 @@ import portal from '../../img/portal.svg'
 import portal2 from '../../img/portal2.svg'
 import { Game, InfoGame, InfoGames, VenomWallet } from '../../logic/game'
 import { EverWallet } from '../../logic/wallet/hook'
-import { addStr } from '../../logic/utils'
+import { addStr, weiToEth } from '../../logic/utils'
 
 interface MainProps {
     id: string,
@@ -167,7 +167,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                                             <th>Portals</th>
                                             <th>Rounds</th>
                                             <th>Prize per<br /> round, {props.typeNetwork.toUpperCase()}</th>
-                                            <th>Winnings,<br /> {props.typeNetwork.toUpperCase()}</th>
+                                            {/* <th>Winnings,<br /> {props.typeNetwork.toUpperCase()}</th> */}
                                             <th>Balance left,<br /> {props.typeNetwork.toUpperCase()}</th>
                                         </tr>
                                     </thead>
@@ -184,9 +184,9 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                                                 <td>{gameL.info._board.columns + 'x' + gameL.info._board.columns}</td>
                                                 <td>🔵 {gameL.info._blueBeams.length} 🔴 {gameL.info._redBeams.length}</td>
                                                 <td>{gameL.rounds._rounds.length}</td>
-                                                <td>10</td>
-                                                <td>100.11</td>
-                                                <td>1 456.12</td>
+                                                <td>{weiToEth(gameL.rounds._rounds[0]?.prizeFund, 9)}</td>
+                                                {/* <td>100.11</td> */}
+                                                <td>{weiToEth(gameL.rounds._rounds[0]?.prizeFund, 9)}</td>
                                             </tr> : null
                                         ))}
 

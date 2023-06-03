@@ -9,7 +9,7 @@ import { Panel, Div, Button, Link } from '../../components'
 import chery from '../../img/chery.svg'
 import win1 from '../../img/win.svg'
 import win2 from '../../img/win2.svg'
-import { addStr } from '../../logic/utils'
+import { addStr, weiToEth } from '../../logic/utils'
 import { ContractEvents, Game, InfoGames, ObjPixel, Player, VenomWallet } from '../../logic/game'
 
 import { BoardBlock } from './board'
@@ -235,9 +235,9 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                         <div className="center-block">
                             <div className="title-bar">
-                                <h3 className='raider-font'>Prize: 10</h3>
+                                <h3 className='raider-font'>Prize: {weiToEth(infoGame.rounds._rounds[0]?.prizeFund, 9)}</h3>
                                 <h3 className='raider-font'>{timer}</h3>
-                                <h3 className='raider-font'>Jackpot: 100.17</h3>
+                                <h3 className='raider-font'>Jackpot: {weiToEth(infoGame.jackpot, 9)}</h3>
 
                             </div>
 

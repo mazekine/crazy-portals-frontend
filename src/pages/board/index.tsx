@@ -198,7 +198,9 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                 <div className="title-bar">
                                     <h3 className='raider-font'>
                                         Prize: {weiToEth(infoGame.rounds._rounds[0]?.prizeFund, 9)} {props.typeNetwork.toUpperCase()}</h3>
-                                    <h3 className='raider-font'>Jackpot: 100.17 {props.typeNetwork.toUpperCase()}</h3>
+                                    <h3 className='raider-font'>
+                                        Jackpot: {weiToEth(infoGame.jackpot, 9)} {props.typeNetwork.toUpperCase()}
+                                    </h3>
 
                                 </div>
 
@@ -251,19 +253,19 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         </div>
                                         <div className="cell">
                                             <span>Remaining balance, {props.typeNetwork.toUpperCase()}</span>
-                                            <span>1 456</span>
+                                            <span>{weiToEth(infoGame.balance, 9)}</span>
                                         </div>
-                                        <div className="cell">
+                                        {/* <div className="cell">
                                             <span>Paid out, {props.typeNetwork.toUpperCase()}</span>
                                             <span>3 456</span>
-                                        </div>
+                                        </div> */}
                                         <div className="cell">
                                             <span>Rake to jackpot</span>
                                             <span>{infoGame.rounds._rounds[0]?.rakeToJackpotRate}%</span>
                                         </div>
                                         <div className="cell">
                                             <span>Jackpot balance, {props.typeNetwork.toUpperCase()}</span>
-                                            <span>100.17</span>
+                                            <span>{weiToEth(infoGame.jackpot, 9)}</span>
                                         </div>
 
                                     </div>

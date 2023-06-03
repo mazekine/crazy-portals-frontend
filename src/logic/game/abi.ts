@@ -737,6 +737,20 @@ export const gameAbi = {
         { components: [ { name: 'expiresAt', type: 'uint64' }, { components: [ { components: [ { name: 'cell', type: 'uint16' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'coordinate', type: 'tuple' } ], name: 'from', type: 'tuple' }, { components: [ { name: 'cell', type: 'uint16' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'coordinate', type: 'tuple' } ], name: 'to', type: 'tuple' } ], name: 'playerSteps', type: 'map(address,tuple[])' } ], name: 'roundMoves', type: 'map(uint64,tuple)' },
         { name: 'playerCell', type: 'map(address,uint16)' },
         { components: [ { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'from', type: 'tuple' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'to', type: 'tuple' }, { name: 'type_', type: 'uint8' } ], name: 'cells', type: 'map(uint16,optional(tuple))' },
-        { components: [ { name: 'rakes', type: 'uint128' }, { name: 'jackpot', type: 'uint128' }, { components: [ { name: 'prize', type: 'uint128' }, { name: 'entranceFee', type: 'uint128' }, { name: 'playerJackpot', type: 'map(address,uint128)' } ], name: 'roundTreasury', type: 'map(uint64,tuple)' } ], name: 'boardTreasury', type: 'tuple' }
+        {
+            components: [
+                { name: 'rakes', type: 'uint128' },
+                { name: 'jackpot', type: 'uint128' },
+                {
+                    components: [
+                        { name: 'prize', type: 'uint128' },
+                        { name: 'entranceFee', type: 'uint128' },
+                        { name: 'playerJackpot', type: 'map(address,uint128)' } ],
+                    name: 'roundTreasury',
+                    type: 'map(uint64,tuple)'
+                } ],
+            name: 'boardTreasury',
+            type: 'tuple'
+        }
     ]
 } as const

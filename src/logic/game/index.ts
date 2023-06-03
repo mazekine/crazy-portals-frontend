@@ -95,6 +95,12 @@ interface PrizeFundPerRound {
     prizeFundPerRound: string
 }
 
+interface Jackpot {
+    rakes: string,
+    jackpot: string,
+    roundTreasury: any
+}
+
 export interface Rounds {
     _rounds: Round[]
 }
@@ -104,7 +110,9 @@ export interface InfoGames {
     rounds: (Rounds | undefined),
     address: Address,
     seed: string,
-    owner: string
+    owner: string,
+    balance: string,
+    jackpot: string
 
 }
 
@@ -258,8 +266,6 @@ class Game {
                 )
 
                 let type = typePortal.length > 0 ? 'portal-' + typePortal[0].type : 'default'
-
-                
 
                 if (type !== 'default') {
                     const indexPortal = portals.findIndex(
@@ -477,7 +483,7 @@ class Game {
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
         try {
-            const getData = contractGame.methods.joinRound({ answerId: 0, roundId } as never)
+            const getData = contractGame.methods.joinRound({ roundId } as never)
 
             const data = await getData.send({
                 from: this._wallet.account.address,
@@ -508,7 +514,7 @@ class Game {
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
         try {
-            const getData = contractGame.methods.roll({ answerId: 0 } as never)
+            const getData = contractGame.methods.roll({ } as never)
 
             const data = await getData.send({
                 from: this._wallet.account.address,
@@ -625,6 +631,25 @@ class Game {
         }
     }
 
+    public async getJackpot (address: Address): Promise<Jackpot | undefined> {
+        if (!this._wallet) return undefined
+        if (!this._wallet.provider) {
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const data = await contractGame.fields.boardTreasury()
+
+            console.log('getJackpot', data)
+            return data
+        } catch (error) {
+            console.log('getJackpot', error)
+            return undefined
+        }
+    }
+
     public async getPlayerRound (address: Address): Promise<(readonly [Address, string])[] | undefined> {
         if (!this._wallet) return undefined
         if (!this._wallet.provider) {
@@ -644,30 +669,55 @@ class Game {
         }
     }
 
+    public async getBalance (address: Address): Promise<string | undefined> {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('getBalance error')
+            return undefined
+        }
+
+        try {
+            const balance = await this._wallet.provider.getBalance(address)
+
+            console.log('getBalance', balance)
+            return balance
+        } catch (error) {
+            console.log('getBalance', error)
+            return undefined
+        }
+    }
+
     public async getAllInfoGames (addresses: Address[]): Promise<InfoGames[] | undefined> {
         const allInfo = []
         const allRounds = []
         const allseed = []
         const allowner = []
+        const balance = []
+        const jackpot = []
 
         for (let i = 0; i < addresses.length; i++) {
             allInfo.push(this.getInfoForGames(addresses[i]))
             allRounds.push(this.getRounds(addresses[i]))
             allseed.push(this.getSeed(addresses[i]))
             allowner.push(this.getOwner(addresses[i]))
+            balance.push(this.getBalance(addresses[i]))
+            jackpot.push(this.getJackpot(addresses[i]))
         }
 
         const allPromise = [
             Promise.all(allInfo),
             Promise.all(allRounds),
             Promise.all(allseed),
-            Promise.all(allowner)
+            Promise.all(allowner),
+            Promise.all(balance),
+            Promise.all(jackpot)
         ]
         const allPromiseData = await Promise.all(allPromise)
         const infos = allPromiseData[0] as (InfoGame | undefined)[]
         const rounds = allPromiseData[1] as (Rounds | undefined)[]
         const seeds = allPromiseData[2] as (Seed | undefined)[]
         const owners = allPromiseData[3] as (Owner | undefined)[]
+        const balances = allPromiseData[4] as (string | undefined)[]
+        const jackpots = allPromiseData[5] as (Jackpot | undefined)[]
         // const infos = await Promise.all(allInfo)
         // const rounds = await Promise.all(allRounds)
         // const seeds = await Promise.all(allseed)
@@ -680,7 +730,9 @@ class Game {
                 rounds: rounds[i],
                 address: addresses[i],
                 seed: seeds[i]?.seed ?? '',
-                owner: owners[i]?.value0.toString() ?? ''
+                owner: owners[i]?.value0.toString() ?? '',
+                balance: balances[i] ?? '',
+                jackpot: jackpots[i]?.jackpot ?? ''
             })
         }
 
