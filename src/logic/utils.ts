@@ -9,8 +9,9 @@ export function addStr (addr: string | undefined): string {
     return addr.replace(addr.slice(5, 62), '...')
 }
 
-export function weiToEth (nanoAmount: bigint | string | BigNumberish, decimals: number): string {
+export function weiToEth (nanoAmount: bigint | string | BigNumberish | undefined, decimals: number): string {
     // console.log(nanoAmount)
+    if (!nanoAmount) return '0'
     const amount = formatUnits(nanoAmount, decimals)
     let stringAmount = Number(amount).toPrecision(2)
 
