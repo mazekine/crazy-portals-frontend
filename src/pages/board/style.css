@@ -276,3 +276,31 @@
 .player-block.you {
     background-color: #EEF4FF;
 }
+
+.block-img {
+    border: 1px solid #CCDEFF;
+    padding: 50px 100px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.tre-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tre-btn > * {
+    margin-right: 10px;
+}
+
+.tre-btn > *:last-child {
+    margin: 0;
+}
+
+.in-block-img {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+}

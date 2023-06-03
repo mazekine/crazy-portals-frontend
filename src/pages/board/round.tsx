@@ -7,6 +7,8 @@ import moment from 'moment'
 import { Panel, Div, Button, Link } from '../../components'
 
 import chery from '../../img/chery.svg'
+import win1 from '../../img/win.svg'
+import win2 from '../../img/win2.svg'
 import { addStr } from '../../logic/utils'
 import { ContractEvents, Game, InfoGames, ObjPixel, Player, VenomWallet } from '../../logic/game'
 
@@ -175,9 +177,13 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                 }
 
                 if (ev === 'RoundFinished') {
-                    if (data.round === round) {
-                        setWin(1)
+                    if (data.roundId === round) {
                         console.log('Finish!!!')
+                        if (data.winner.toString() === props.venomWallet?.address) {
+                            setWin(3)
+                        } else {
+                            setWin(1)
+                        }
                     }
                 }
             })
@@ -191,6 +197,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     useEffect(() => {
         if (address && round) {
             getInfo([ new Address(address) ])
+
+            // setWin(1)
         } else {
             history('/boards')
         }
@@ -295,33 +303,39 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                     </div> : null }
 
-                {win === 1 ? <div className="page-block">
-                    <div className="block-img">
-                        <div>
-                            <h3 className='raider-font'>You are the winner!</h3>
-                            <Button onClick={() => claim()} stretched>Claim reward</Button>
+                {win === 1 ? <div className="page-block" style={{ justifyContent: 'center' }}>
+                    <div className="center-block" >
+                        <div className="block-img">
+                            <div className="in-block-img">
+                                <img src={win1} />
+                                <h3 className='raider-font' style={{ textAlign: 'center' }}>You are the winner!</h3>
+                                <Button onClick={() => claim()} stretched>Claim reward</Button>
+                            </div>
                         </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
-                        <Button onClick={() => null} stretched type="secondory">Stats</Button>
-                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
+                        <div className="tre-btn">
+                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
+                            <Button onClick={() => null} stretched type="secondory">Stats</Button>
+                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
 
+                        </div>
                     </div>
                 </div> : null}
 
-                {win === 3 ? <div className="page-block">
-                    <div className="block-img">
-                        <div>
-                            <h3 className='raider-font'>Well played!</h3>
-                            <Button onClick={() => history('/boards/' + address)} stretched>Try again</Button>
+                {win === 3 ? <div className="page-block" style={{ justifyContent: 'center' }}>
+                    <div className="center-block">
+                        <div className="block-img">
+                            <div className="in-block-img">
+                                <img src={win2} />
+                                <h3 className='raider-font' style={{ textAlign: 'center' }}>Well played!</h3>
+                                <Button onClick={() => history('/boards/' + address)} stretched>Try again</Button>
+                            </div>
                         </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
-                        <Button onClick={() => null} stretched type="secondory">Stats</Button>
-                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
+                        <div className="tre-btn">
+                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
+                            <Button onClick={() => null} stretched type="secondory">Stats</Button>
+                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
 
+                        </div>
                     </div>
                 </div> : null}
 
