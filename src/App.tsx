@@ -19,6 +19,8 @@ import { Round } from './pages/board/round'
 import { useEverWallet } from './logic/wallet/useEverWallet'
 import { Game, VenomWallet } from './logic/game'
 
+import load from './img/load.gif'
+
 const widthDesktop = 1160
 
 const widthMobile = 750
@@ -155,6 +157,7 @@ export const App: React.FC = () => {
             setModal(<div className="modal">
                 <div className="loadModal">
                     <h3>Wait transaction</h3>
+                    <img src={load} />
                 </div>
             </div>)
         } else if (type === 'close') {

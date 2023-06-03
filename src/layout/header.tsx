@@ -58,12 +58,12 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
             }
             after={
                 <div className="balance-full-block">
-                    <div className="change_network">
+                    {/* <div className="change_network">
                         <select value={props.typeNetwork} onChange={e => props.setTypeNetwork(e.target.value)}>
                             <option value="venom">Venom</option>
                             <option value="ever">Ever</option>
                         </select>
-                    </div>
+                    </div> */}
                     { props.typeNetwork === 'ever' ? <> {
                         props.everWallet && props.everWallet.account
                             ? <div className="balance-block">

@@ -53,6 +53,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
         const interv = setInterval(() => {
             duration = moment.duration(Number(duration) - interval, 'milliseconds')
+            if (duration.seconds() === 0) {
+                setTimer('00:00')
+                clearInterval(interv)
+            }
             setTimer(`${duration.minutes()}:${duration.seconds()}`)
         }, interval)
     }
@@ -60,7 +64,6 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     async function getPlayers (address1: Address) {
         if (!game) return undefined
         const players3 = await game.getPlayersForRound(address1, round ?? '')
-
         setPlayersRound2(players3)
         return true
     }
@@ -126,17 +129,18 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
-        if (!firstRender2) {
+        if (!firstRender2 && address && game) {
             setFirstRender2(true)
 
             const int = setInterval(() => {
                 console.log('update')
                 if (address) getPlayers(new Address(address))
-            }, 3000)
+                else console.log('error address')
+            }, 2000)
 
             return () => clearInterval(int)
         }
-    }, [])
+    }, [ address, game ])
 
     useEffect(() => {
         if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
@@ -166,6 +170,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             })
         }
     }, [ address, game, round ])
+
+    useEffect(() => {
+        console.log('update playersRound2', playersRound2)
+    }, [ playersRound2 ])
 
     useEffect(() => {
         if (address && round) {
@@ -221,7 +229,14 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '40px' }}>
+                            <div className="start_line">
+                                <span style={{ fontSize: '10px' }}>Start line:</span>
+                                {playersRound2.map((p, key5) => (
+                                    p.number === 0 ? <div key={key5} className={'player in-' + key5 }></div> : null
+                                ))}
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '20px' }}>
                                 {playersRound2.map((p, key) => (
                                     <div className="player-block" key={key}>
                                         <div className={'player in-' + key}></div>
@@ -267,7 +282,18 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     </div> : null }
 
                 {win !== 0 ? <div className="page-block">
+                    <div className="block-img">
+                        <div>
+                            <h3 className='raider-font'>You are the winner!</h3>
+                            <Button onClick={() => startRoll()} stretched>Claim reward</Button>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Button onClick={() => startRoll()} stretched type="secondory">Back</Button>
+                        <Button onClick={() => startRoll()} stretched type="secondory">Stats</Button>
+                        <Button onClick={() => startRoll()} stretched type="secondory">Replay</Button>
 
+                    </div>
                 </div> : null}
 
             </Div>

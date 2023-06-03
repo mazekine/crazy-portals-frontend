@@ -27,6 +27,7 @@ interface MainProps {
 
 export const Board: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
+    const [ firstRender2, setFirstRender2 ] = React.useState<boolean>(false)
 
     const  [ game, setGame ] = React.useState<Game | undefined>(undefined)
 
@@ -80,6 +81,19 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
+        if (!firstRender2 && address && game) {
+            setFirstRender2(true)
+
+            const int = setInterval(() => {
+                console.log('update')
+                if (address) getRounds(new Address(address))
+            }, 2000)
+
+            return () => clearInterval(int)
+        }
+    }, [ address, game ])
+
+    useEffect(() => {
         if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
         if (game && props.typeNetwork === 'venom') game.sunc(props.venomWallet)
     }, [ props.everWallet, props.venomWallet ])
@@ -94,6 +108,10 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                     setTimeout(() => {
                         getRounds(addr)
                     }, 500)
+
+                    setTimeout(() => { // TODO
+                        getRounds(addr)
+                    }, 1500)
                 }
             })
         }

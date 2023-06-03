@@ -81,4 +81,13 @@ body {
     padding: 16px;
     border-radius: 16px;
     background-color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+}
+
+.loadModal > * {
+    margin-bottom: 20px;
 }
