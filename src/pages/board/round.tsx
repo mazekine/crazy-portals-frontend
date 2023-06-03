@@ -92,6 +92,18 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         return true
     }
 
+    async function claim () {
+        if (!game || !address || !round) {
+            console.error('joinRound null')
+            return undefined
+        }
+        props.openModal('load')
+        const data = await game.claim(new Address(address), round)
+
+        props.openModal('close')
+        return true
+    }
+
     async function joinRound () {
         if (!game || !address || !round) {
             console.error('joinRound null')
@@ -283,17 +295,32 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                     </div> : null }
 
-                {win !== 0 ? <div className="page-block">
+                {win === 1 ? <div className="page-block">
                     <div className="block-img">
                         <div>
                             <h3 className='raider-font'>You are the winner!</h3>
-                            <Button onClick={() => startRoll()} stretched>Claim reward</Button>
+                            <Button onClick={() => claim()} stretched>Claim reward</Button>
                         </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Button onClick={() => startRoll()} stretched type="secondory">Back</Button>
-                        <Button onClick={() => startRoll()} stretched type="secondory">Stats</Button>
-                        <Button onClick={() => startRoll()} stretched type="secondory">Replay</Button>
+                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
+                        <Button onClick={() => null} stretched type="secondory">Stats</Button>
+                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
+
+                    </div>
+                </div> : null}
+
+                {win === 3 ? <div className="page-block">
+                    <div className="block-img">
+                        <div>
+                            <h3 className='raider-font'>Well played!</h3>
+                            <Button onClick={() => history('/boards/' + address)} stretched>Try again</Button>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
+                        <Button onClick={() => null} stretched type="secondory">Stats</Button>
+                        <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
 
                     </div>
                 </div> : null}

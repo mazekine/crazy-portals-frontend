@@ -524,6 +524,31 @@ class Game {
         }
     }
 
+    public async claim (address: Address, round: string): Promise<true | undefined> {
+        if (!this._wallet || !this._wallet.provider || !this._wallet.account || !this._wallet.provider || !this._wallet.account.address) {
+            console.log('claim not start', this._wallet)
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.claim({ roundId: round } as never)
+
+            const data = await getData.send({
+                from: this._wallet.account.address,
+                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                bounce: true
+            })
+
+            console.log('claim', data)
+            return true
+        } catch (error) {
+            console.log('claim', error)
+            return undefined
+        }
+    }
+
     public async getPlayerCell (address: Address): Promise<(readonly [Address, string])[] | undefined> {
         if (!this._wallet) return undefined
         if (!this._wallet.provider) {
