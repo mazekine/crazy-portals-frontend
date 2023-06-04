@@ -55,7 +55,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
         const interv = setInterval(() => {
             duration = moment.duration(Number(duration) - interval, 'milliseconds')
-            if (duration.seconds() === 0) {
+            if (duration.seconds() === 0 && duration.minutes() === 0) {
                 setTimer('00:00')
                 clearInterval(interv)
             }

@@ -86,7 +86,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
 
             const int = setInterval(() => {
                 console.log('update')
-                if (address) getRounds(new Address(address))
+                if (address) getInfo([ new Address(address) ])
             }, 2000)
 
             return () => clearInterval(int)
@@ -106,12 +106,12 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
             game.onEvents(addr, (ev: ContractEvents) => {
                 if (ev === 'RoundCreated' || ev === 'RoundFinished' || ev === 'RoundJoined') {
                     setTimeout(() => {
-                        getRounds(addr)
+                        getInfo([ addr ])
                     }, 500)
 
-                    setTimeout(() => { // TODO
-                        getRounds(addr)
-                    }, 1500)
+                    // setTimeout(() => { // TODO
+                    //     getRounds(addr)
+                    // }, 1500)
                 }
             })
         }
