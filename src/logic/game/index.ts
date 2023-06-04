@@ -188,12 +188,13 @@ class Game {
     public static generatedCells (size: number): number[][] {
         const fullArr: number[][] = [] // y x
         const Max = size * size
+        console.log('size', size)
 
         for (let i = 0; i < size; i++) {
             let arrX: number[] = []
             for (let i2 = 0; i2 < size; i2++) {
                 const num =  i2 + (i * size)
-                arrX.push(num)
+                arrX.push(num + 1)
             }
 
             if (i % 2) {
@@ -211,12 +212,12 @@ class Game {
 
         try {
             // console.log('y, x', y, x)
-            // console.log('cells', cells)
+            console.log('cells', cells)
             // console.log('cells', cells[y][x])
 
             return cells[y - 1][x - 1]
         } catch (err) {
-            console.log('getNumberFromXY', err)
+            console.error('getNumberFromXY', err)
             return 0
         }
     }
@@ -230,11 +231,11 @@ class Game {
                 portals: [
                     {
                         number: this.getNumberFromXY(Number(beam[i].from.x), Number(beam[i].from.y), size),
-                        position: []
+                        position: [Number(beam[i].from.x), Number(beam[i].from.y)]
                     },
                     {
                         number: this.getNumberFromXY(Number(beam[i].to.x), Number(beam[i].to.y), size),
-                        position: []
+                        position: [Number(beam[i].to.x), Number(beam[i].to.y)]
                     }
                 ]
             })
@@ -274,8 +275,10 @@ class Game {
 
                     const numOfPortal = typePortal[0].portals[0].number === num ? 0 : 1
 
+                    // console.log((i % 2 ? size - i2 : i2 + 1) - 1, (size - i) - 1, localPortals[indexPortal])
+
                     console.log((i % 2 ? size - i2 : i2 + 1) - 1, (size - i) - 1, localPortals[indexPortal])
-                    localPortals[indexPortal].portals[numOfPortal].position = [ (i % 2 ? size - i2 : i2 + 1) - 1, (size - i) - 1 ] // x y
+                    // localPortals[indexPortal].portals[numOfPortal].position = [ (i % 2 ? size - i2 : i2 + 1) - 1, (size - i) - 1 ] // x y
                 }
 
                 if (num === Max) type = 'win'
