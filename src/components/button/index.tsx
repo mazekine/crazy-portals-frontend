@@ -32,11 +32,11 @@ export const Button: React.FC<MainProps> = ({
 
     return (
         <button {...restProps} className={
-            `btn ${type}-btn ${size}-btn ${stretched ? 'stretched-btn' : ''} ${load ? 'load-btn' : ''}`
+            `btn ${type}-btn ${size}-btn ${stretched ? 'stretched-btn' : ''} ${load ? ' load-btn' : ''}`
         } onClick={!load ? onClick : () => null}>
             {load ? <Oval
-                height={14}
-                width={14}
+                height={20}
+                width={20}
                 color="#fff"
                 wrapperStyle={{}}
                 wrapperClass=""

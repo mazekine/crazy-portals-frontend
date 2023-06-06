@@ -38,10 +38,12 @@
 }
 
 .l-btn {
-    padding: 14px 14px;
+    padding: 14px 18px;
     border-radius: 6px;
     font-size: 15px;
     font-weight: 500;
+    height: 56px!important;
+    box-sizing: border-box;
 }
 
 .m-btn {

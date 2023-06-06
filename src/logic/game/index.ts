@@ -87,7 +87,7 @@ export interface InfoGame {
     _redBeams: Beam[]
 }
 
-interface Round {
+export interface Round {
     id: string,
     validUntil: string,
     moveDuration: string,
@@ -498,6 +498,35 @@ class Game {
         }
     }
 
+    public async giveUp (address: Address): Promise<true | undefined> {
+        if (!this._wallet || !this._wallet.provider || !this._wallet.account || !this._wallet.account.address) {
+            console.log('giveUp not start', this._wallet)
+            return undefined
+        }
+
+        const contractGame = new this._wallet.provider.Contract(abi, address)
+
+        try {
+            const getData = contractGame.methods.giveUpAllowed({ } as never)
+
+            const data = await getData.send({
+                from: this._wallet.account.address,
+                amount: new BigNumber(0.2).shiftedBy(9).toFixed(0),
+                bounce: true
+            })
+
+            // data.
+
+            // const data = await getData.call()
+
+            console.log('giveUp', data)
+            return true
+        } catch (error) {
+            console.log('giveUp', error)
+            return undefined
+        }
+    }
+
     public async joinRound (address: Address, roundId: string): Promise<true | undefined> {
         if (!this._wallet || !this._wallet.provider || !this._wallet.account || !this._wallet.provider || !this._wallet.account.address) {
             console.log('joinRound not start', this._wallet)
@@ -567,7 +596,7 @@ class Game {
 
             const data = await getData.send({
                 from: this._wallet.account.address,
-                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                amount: new BigNumber(0.3).shiftedBy(9).toFixed(0),
                 bounce: true
             })
 
@@ -710,7 +739,7 @@ class Game {
             return undefined
         }
     }
-    
+
 
     public async getAllInfoGames (addresses: Address[]): Promise<InfoGames[] | undefined> {
         const allInfo = []

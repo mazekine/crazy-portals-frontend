@@ -9,8 +9,8 @@ import { Panel, Div, Button, Link } from '../../components'
 import chery from '../../img/chery.svg'
 import win1 from '../../img/win.svg'
 import win2 from '../../img/win2.svg'
-import { addStr, weiToEth } from '../../logic/utils'
-import { ContractEvents, Game, InfoGames, ObjPixel, Player, PlayerMoved, VenomWallet } from '../../logic/game'
+import { addStr, delay, weiToEth } from '../../logic/utils'
+import { ContractEvents, Game, InfoGames, ObjPixel, Player, PlayerMoved, VenomWallet, Round as Round2 } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -28,6 +28,12 @@ interface MainProps {
     load1: boolean
 }
 
+interface AnimationWait {
+    address: string,
+    from: number,
+    to: number
+}
+
 export const Round: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
     const [ firstRender2, setFirstRender2 ] = React.useState<boolean>(false)
@@ -40,11 +46,16 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
 
+    const  [ thisRound, setThisRound ] = React.useState<Round2 | undefined>(undefined)
+
     const  [ playersRound2, setPlayersRound2 ] = React.useState<Player[] | undefined>(undefined)
 
     const  [ animation, setAnimation ] = React.useState<boolean>(false)
 
     const  [ interval2, setInterval2 ] = React.useState<NodeJS.Timer | undefined>(undefined)
+
+    const  [ animationWait, setAnimationWait ] = React.useState<AnimationWait[]>([])
+    const  [ waitCount, setWaitCount ] = React.useState<number>(0)
 
     const { address, round } = useParams()
     const history = useNavigate()
@@ -81,9 +92,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         setAnimation(true)
 
         let moveToUp = true
-        let distance = toN - fromN
+        const distance = Math.abs(toN - fromN)
         if (fromN > toN) { // move to lose
-            distance = fromN - toN
             moveToUp = false
         }
         const playerIndex = playersRound3.findIndex(p => p.address.toString() === address2)
@@ -97,9 +107,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         let i = 0
         const updatePlayer = playersRound3[playerIndex]
         const intr = setInterval(() => {
-            if (i > distance) {
+            if (i === distance) {
                 clearInterval(intr)
                 setAnimation(false)
+                setWaitCount(waitCount - 1)
                 return
             }
 
@@ -112,17 +123,33 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             console.log('playerIndex i', i, updatePlayer.number)
 
             i++
-        }, 1000 / distance)
+        }, distance > 6 ? 200 : 1000)
         return true
     }
 
-    async function getPlayers (address1: Address) {
+    async function delayCb (de: number, cb: Function) {
+        await delay(de)
+        cb()
+    }
+
+    async function getPlayers (address1: Address, update: boolean = false) {
         if (!game) {
             console.log('error getPlayers')
             return undefined
         }
         const players3 = await game.getPlayersForRound(address1, round ?? '')
-        setPlayersRound2(players3)
+
+        if (update && playersRound2) {
+            for (let i = 0; i < playersRound2.length; i++) {
+                const ind = playersRound2?.findIndex(p => p.address.toString() === playersRound2[i].address.toString())
+                if (ind === -1) {
+                    setPlayersRound2(players3)
+                }
+            }
+        }
+        if (!playersRound2 || !update) {
+            setPlayersRound2(players3)
+        }
         return true
     }
 
@@ -133,6 +160,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         if (!info) return undefined
         setInfoGame(info[0])
 
+        if (!round) return undefined
+
         // const players = await game.getPlayerCell(list[0])
         // setPlayersNumber(players)
         // game.getPlayerRound(list[0])
@@ -140,6 +169,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         // const players2 = await game.getRoundsPlayers(list[0])
 
         // setPlayersRound(players2)
+
+        if (!info[0].rounds) return undefined
+        const roundInfo = info[0].rounds._rounds.filter(r => r.id === round)
+        setThisRound(roundInfo[0])
 
         getPlayers(list[0])
 
@@ -152,13 +185,25 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     async function claim () {
         if (!game || !address || !round) {
-            console.error('joinRound null')
+            console.error('claim null')
             return undefined
         }
         props.openModal('load')
         const data = await game.claim(new Address(address), round)
 
         props.openModal('close')
+        return true
+    }
+
+    async function giveUp () {
+        if (!game || !address || !round) {
+            console.error('giveUp null')
+            return undefined
+        }
+        // props.openModal('load')
+        const data = await game.giveUp(new Address(address))
+
+        // props.openModal('close')
         return true
     }
 
@@ -187,6 +232,24 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }
 
     useEffect(() => {
+        if (animationWait.length > 0 && playersRound2) {
+            console.log('waitCount', waitCount)
+            let waitCountLocal = 0
+            for (let i = waitCount; i < animationWait.length; i++) {
+                delayCb(i * 1000, () => playerGo(
+                    animationWait[i].from,
+                    animationWait[i].to,
+                    animationWait[i].address,
+                    playersRound2
+                ))
+                waitCountLocal += Math.abs(animationWait[i].from - animationWait[i].to)
+            }
+            setWaitCount(waitCount + waitCountLocal)
+            setAnimationWait([])
+        }
+    }, [ animationWait ])
+
+    useEffect(() => {
         if (!firstRender
             && (props.typeNetwork === 'venom' ? props.venomWallet?.provider && props.venomWallet?.account : props.everWallet)) {
             setFirstRender(true)
@@ -208,14 +271,25 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     if (data.round === round) {
                         if (ev === 'PlayerMoved') {
                             const typedData = data as PlayerMoved
+
+                            setAnimationWait([ ...animationWait, {
+                                address: typedData.player.toString(),
+                                from: Number(typedData.from.cell),
+                                to: Number(typedData.to.cell)
+
+                            } ])
                             setTimeout(() => {
-                                playerGo(
-                                    Number(typedData.from.cell),
-                                    Number(typedData.to.cell),
-                                    typedData.player.toString(),
-                                    playersRound3
-                                )
+                                // playerGo(
+                                //     Number(typedData.from.cell),
+                                //     Number(typedData.to.cell),
+                                //     typedData.player.toString(),
+                                //     playersRound3
+                                // )
                             }, animation ? 1000 : 0)
+                        }
+
+                        if (ev === 'RoundJoined') {
+                            getPlayers(addr, true)
                         }
                         // setTimeout(() => {
                         //     getPlayers(addr)
@@ -246,11 +320,17 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ address, game, playersRound2, round ])
 
     useEffect(() => {
+        if (props.venomWallet?.address === undefined) {
+            setFirstRender2(false)
+        }
+    }, [ props.venomWallet ])
+
+    useEffect(() => {
         if (address && round && game && !animation && !interval2) {
             console.log('===start update')
             const int = setInterval(() => {
                 console.log('update', !animation)
-                // getPlayers(new Address(address))
+                // getPlayers(new Address(address), true)
             }, 2000)
 
             setInterval2(int)
@@ -305,7 +385,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     <div>Round #{round}</div>
                 </div>
 
-                {game && address && infoGame && round && playersRound2 && win === 0 && infoGame.rounds
+                {game && address && infoGame && round && playersRound2 && win === 0 && infoGame.rounds && thisRound
                     ? <div className="page-block">
                         <div className="left-block">
                             <div className="title-bar">
@@ -322,7 +402,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                         <div className="center-block">
                             <div className="title-bar">
-                                <h3 className='raider-font'>Prize: {weiToEth(infoGame.rounds._rounds[0]?.prizeFund, 9)}</h3>
+                                <h3 className='raider-font'>Prize: {weiToEth(thisRound.prizeFund, 9)}</h3>
                                 <h3 className='raider-font'>{timer}</h3>
                                 <h3 className='raider-font'>Jackpot: {weiToEth(infoGame.jackpot, 9)}</h3>
 
@@ -380,7 +460,17 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                             ? props.venomWallet?.address : props.everWallet.account?.address.toString()
                                     )
                                 ) > -1
-                                    ? <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
+                                    ? <div style={{ width: '100%'}}>
+                                        <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
+                                        {thisRound.giveUpAllowed
+                                            ? <Button
+                                                onClick={() => giveUp()}
+                                                stretched
+                                                type="outline"
+                                                size="m"
+                                                style={{marginTop: '30px'}}
+                                            >Give Up</Button> : null }
+                                    </div>
                                     : <Button onClick={() => joinRound()} stretched load={props.load1}>Join</Button> }
                                 {/* <Button onClick={() => joinRound()}>Join</Button>
                                 <Button onClick={() => startRoll()}>Roll</Button> */}
