@@ -10,7 +10,7 @@ import chery from '../../img/chery.svg'
 import win1 from '../../img/win.svg'
 import win2 from '../../img/win2.svg'
 import { addStr, weiToEth } from '../../logic/utils'
-import { ContractEvents, Game, InfoGames, ObjPixel, Player, VenomWallet } from '../../logic/game'
+import { ContractEvents, Game, InfoGames, ObjPixel, Player, PlayerMoved, VenomWallet } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -24,7 +24,8 @@ interface MainProps {
     everWallet: EverWallet,
     openModal: Function,
     venomWallet: VenomWallet | undefined,
-    typeNetwork: 'venom' | 'ever'
+    typeNetwork: 'venom' | 'ever',
+    load1: boolean
 }
 
 export const Round: React.FC<MainProps> = (props: MainProps) => {
@@ -40,6 +41,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
 
     const  [ playersRound2, setPlayersRound2 ] = React.useState<Player[] | undefined>(undefined)
+
+    const  [ animation, setAnimation ] = React.useState<boolean>(false)
+
+    const  [ interval2, setInterval2 ] = React.useState<NodeJS.Timer | undefined>(undefined)
 
     const { address, round } = useParams()
     const history = useNavigate()
@@ -63,8 +68,59 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         }, interval)
     }
 
+    function playerGo (fromN: number, toN: number, address2: string, playersRound3: Player[]) {
+        if (!playersRound3) {
+            console.log('playerGo not start')
+            return undefined
+        }
+
+        // const cells = Game.generatedCells(Number(infoGame.info._board.columns))
+        // const fromN = cells[Number(from.y) - 1][Number(from.x) - 1]
+        // const toN = cells[Number(to.y) - 1][Number(to.x) - 1]
+        console.log('playerGo start')
+        setAnimation(true)
+
+        let moveToUp = true
+        let distance = toN - fromN
+        if (fromN > toN) { // move to lose
+            distance = fromN - toN
+            moveToUp = false
+        }
+        const playerIndex = playersRound3.findIndex(p => p.address.toString() === address2)
+
+        console.log('playerIndex', playerIndex)
+        if (playerIndex === -1) {
+            setAnimation(false)
+            return undefined
+        }
+
+        let i = 0
+        const updatePlayer = playersRound3[playerIndex]
+        const intr = setInterval(() => {
+            if (i > distance) {
+                clearInterval(intr)
+                setAnimation(false)
+                return
+            }
+
+            updatePlayer.number = moveToUp ? Number(fromN) + 1 + i : Number(fromN) - 1 + i
+            const listPlayers = playersRound3
+            listPlayers[playerIndex] = updatePlayer
+
+            setPlayersRound2(listPlayers)
+
+            console.log('playerIndex i', i, updatePlayer.number)
+
+            i++
+        }, 1000 / distance)
+        return true
+    }
+
     async function getPlayers (address1: Address) {
-        if (!game) return undefined
+        if (!game) {
+            console.log('error getPlayers')
+            return undefined
+        }
         const players3 = await game.getPlayersForRound(address1, round ?? '')
         setPlayersRound2(players3)
         return true
@@ -143,36 +199,27 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
-        if (!firstRender2 && address && game) {
+        if (address && game && round && playersRound2 && !firstRender2) {
             setFirstRender2(true)
-
-            const int = setInterval(() => {
-                console.log('update')
-                if (address) getPlayers(new Address(address))
-                else console.log('error address')
-            }, 2000)
-
-            return () => clearInterval(int)
-        }
-    }, [ address, game ])
-
-    useEffect(() => {
-        if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
-        if (game && props.typeNetwork === 'venom') game.sunc(props.venomWallet)
-    }, [ props.everWallet, props.venomWallet ])
-
-    useEffect(() => {
-        if (address && game && round) {
             const addr = new Address(address)
 
-            getInfo([ addr ])
-
-            game.onEvents(addr, (ev: ContractEvents, data: any) => {
+            game.onEvents(addr, (ev: ContractEvents, data: any, playersRound3 = playersRound2) => {
                 if (ev === 'PlayerMoved' || ev === 'PlayerRemovedFromRound' || ev === 'RoundFinished' || ev === 'RoundJoined') {
                     if (data.round === round) {
-                        setTimeout(() => {
-                            getPlayers(addr)
-                        }, 500)
+                        if (ev === 'PlayerMoved') {
+                            const typedData = data as PlayerMoved
+                            setTimeout(() => {
+                                playerGo(
+                                    Number(typedData.from.cell),
+                                    Number(typedData.to.cell),
+                                    typedData.player.toString(),
+                                    playersRound3
+                                )
+                            }, animation ? 1000 : 0)
+                        }
+                        // setTimeout(() => {
+                        //     getPlayers(addr)
+                        // }, 500)
                     }
                 }
 
@@ -187,6 +234,46 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                     }
                 }
             })
+
+            // const int = setInterval(() => {
+            //     console.log('update')
+            //     if (address && !animation) getPlayers(new Address(address))
+            //     else console.log('error address')
+            // }, 2000)
+
+            // return () => clearInterval(int)
+        }
+    }, [ address, game, playersRound2, round ])
+
+    useEffect(() => {
+        if (address && round && game && !animation && !interval2) {
+            console.log('===start update')
+            const int = setInterval(() => {
+                console.log('update', !animation)
+                // getPlayers(new Address(address))
+            }, 2000)
+
+            setInterval2(int)
+
+            // return () => clearInterval(int)
+        } if (interval2 && animation) {
+            console.log('===stop update')
+            clearInterval(interval2)
+            setInterval2(undefined)
+        }
+    }, [ animation, address, game, round, interval2 ])
+
+    useEffect(() => {
+        if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
+        if (game && props.typeNetwork === 'venom') game.sunc(props.venomWallet)
+    }, [ props.everWallet, props.venomWallet ])
+
+    useEffect(() => {
+        if (address && game && round) {
+            // setFirstRender2(true)
+            const addr = new Address(address)
+
+            getInfo([ addr ])
         }
     }, [ address, game, round ])
 
@@ -293,8 +380,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                             ? props.venomWallet?.address : props.everWallet.account?.address.toString()
                                     )
                                 ) > -1
-                                    ? <Button onClick={() => startRoll()} stretched>Roll</Button>
-                                    : <Button onClick={() => joinRound()} stretched>Join</Button> }
+                                    ? <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
+                                    : <Button onClick={() => joinRound()} stretched load={props.load1}>Join</Button> }
                                 {/* <Button onClick={() => joinRound()}>Join</Button>
                                 <Button onClick={() => startRoll()}>Roll</Button> */}
                             </div>

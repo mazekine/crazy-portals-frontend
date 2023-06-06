@@ -22,7 +22,8 @@ interface MainProps {
     everWallet: EverWallet,
     openModal: Function,
     venomWallet: VenomWallet | undefined,
-    typeNetwork: 'venom' | 'ever'
+    typeNetwork: 'venom' | 'ever',
+    load1: boolean
 }
 
 export const Board: React.FC<MainProps> = (props: MainProps) => {
@@ -186,7 +187,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                     justifyContent: 'center',
                                     marginTop: '16px'
                                 }}>
-                                    <Button onClick={() => newRound()}>New round</Button>
+                                    <Button onClick={() => newRound()} load={props.load1}>New round</Button>
                                 </div>
 
                             </div>

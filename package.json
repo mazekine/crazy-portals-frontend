@@ -39,6 +39,7 @@
         "react-app-rewired": "^2.2.1",
         "react-dom": "^18.1.0",
         "react-inlinesvg": "^3.0.0",
+        "react-loader-spinner": "^5.3.4",
         "react-router": "^6.4.3",
         "react-router-dom": "^6.4.3",
         "react-scripts": "5.0.1",

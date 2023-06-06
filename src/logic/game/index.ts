@@ -21,6 +21,27 @@ export interface VenomWallet {
     },
     type: 'venom' | 'ever'
 }
+
+export interface PlayerMoved {
+    board: Address,
+    round: string,
+    player: Address,
+    from: {
+        cell: string,
+        coordinate: {
+            x: string,
+            y: string
+        }
+    },
+    to: {
+        cell: string,
+        coordinate: {
+            x: string,
+            y: string
+        }
+    }
+
+}
 interface ParamConstruct {
     address: string,
     addressUser: string,
@@ -188,7 +209,7 @@ class Game {
     public static generatedCells (size: number): number[][] {
         const fullArr: number[][] = [] // y x
         const Max = size * size
-        console.log('size', size)
+        // console.log('size', size)
 
         for (let i = 0; i < size; i++) {
             let arrX: number[] = []
@@ -212,7 +233,7 @@ class Game {
 
         try {
             // console.log('y, x', y, x)
-            console.log('cells', cells)
+            // console.log('cells', cells)
             // console.log('cells', cells[y][x])
 
             return cells[y - 1][x - 1]
@@ -457,7 +478,7 @@ class Game {
         const contractGame = new this._wallet.provider.Contract(abi, address)
 
         try {
-            const getData = contractGame.methods.createRound({ answerId: 0 } as never)
+            const getData = contractGame.methods.createRound({ } as never)
 
             const data = await getData.send({
                 from: this._wallet.account.address,
@@ -559,8 +580,8 @@ class Game {
     }
 
     public async getPlayerCell (address: Address): Promise<(readonly [Address, string])[] | undefined> {
-        if (!this._wallet) return undefined
-        if (!this._wallet.provider) {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('error getPlayerCell')
             return undefined
         }
 
@@ -578,10 +599,11 @@ class Game {
     }
 
     public async getPlayersForRound (address: Address, id: string): Promise<Player[] | undefined> {
-        if (!this._wallet) return undefined
-        if (!this._wallet.provider) {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('error getPlayersForRound')
             return undefined
         }
+        console.log('start getPlayersForRound')
 
         const plR = await this.getRoundsPlayers(address)
         const plC = await this.getPlayerCell(address)
@@ -616,8 +638,8 @@ class Game {
     }
 
     public async getRoundsPlayers (address: Address): Promise<(readonly [string, Address[]])[] | undefined> {
-        if (!this._wallet) return undefined
-        if (!this._wallet.provider) {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('error getRoundsPlayers')
             return undefined
         }
 

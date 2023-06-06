@@ -78,6 +78,7 @@ export const App: React.FC = () => {
     const [ isMobile, setIsMobile ] = React.useState<boolean>(window.innerWidth <= widthMobile)
 
     const [ modal, setModal ] = React.useState<any | undefined>(undefined)
+    const [ load1, setLoad ] = React.useState<boolean>(false)
 
     const [ typeNetwork, setTypeNetwork ] = React.useState<'venom' | 'ever'>('venom')
 
@@ -154,14 +155,16 @@ export const App: React.FC = () => {
 
     function openModal (type: 'load' | 'close') {
         if (type === 'load') {
-            setModal(<div className="modal">
-                <div className="loadModal">
-                    <h3>Wait transaction</h3>
-                    <img src={load} />
-                </div>
-            </div>)
+            setLoad(true)
+            // setModal(<div className="modal">
+            //     <div className="loadModal">
+            //         <h3>Wait transaction</h3>
+            //         <img src={load} />
+            //     </div>
+            // </div>)
         } else if (type === 'close') {
             setModal(undefined)
+            setLoad(false)
         }
     }
 
@@ -259,6 +262,7 @@ export const App: React.FC = () => {
                             openModal={openModal}
                             venomWallet={venomWallet}
                             typeNetwork={typeNetwork}
+                            load1={load1}
                         />
                     }/>
                     <Route path="/boards/:address/:round" element={
@@ -271,6 +275,7 @@ export const App: React.FC = () => {
                             openModal={openModal}
                             venomWallet={venomWallet}
                             typeNetwork={typeNetwork}
+                            load1={load1}
                         />
                     }/>
                 </Routes>

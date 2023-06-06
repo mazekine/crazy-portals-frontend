@@ -29,6 +29,8 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
 
     const [ portals, setPortals ] = React.useState<Portal[] | undefined>(undefined)
 
+    const [ playersRound, setPlayersRound ] = React.useState<Player[] | undefined>(undefined)
+
     const { address } = useParams()
     const history = useNavigate()
 
@@ -62,6 +64,7 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
 
         return true
     }
+
 
     useEffect(() => {
         if (!firstRender && props.infoGame && props.infoGame.info && address) {

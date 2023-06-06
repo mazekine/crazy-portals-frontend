@@ -53,3 +53,19 @@
 .stretched-btn {
     width: 100%!important;
 }
+
+.load-btn {
+    cursor: default!important;
+}
+
+.load-btn img {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+}
+
+.load-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

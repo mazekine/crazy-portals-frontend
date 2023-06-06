@@ -97,10 +97,8 @@ export const gameAbi = {
         {
             name: 'createRound',
             inputs: [
-                { name: 'answerId', type: 'uint32' }
             ],
             outputs: [
-                { components: [ { name: 'id', type: 'uint64' }, { name: 'status', type: 'uint8' }, { name: 'winner', type: 'address' }, { name: 'maxPlayers', type: 'uint16' }, { name: 'giveUpAllowed', type: 'bool' }, { name: 'validUntil', type: 'uint64' }, { name: 'roundDuration', type: 'uint64' }, { name: 'moveDuration', type: 'uint64' }, { name: 'autoStartTimestamp', type: 'optional(uint64)' }, { name: 'entryStake', type: 'uint128' }, { name: 'prizeFund', type: 'uint128' }, { name: 'prizeClaimed', type: 'bool' }, { name: 'rake', type: 'uint128' }, { name: 'rakeToJackpotRate', type: 'uint8' } ], name: 'round', type: 'tuple' }
             ]
         },
         {
@@ -737,20 +735,6 @@ export const gameAbi = {
         { components: [ { name: 'expiresAt', type: 'uint64' }, { components: [ { components: [ { name: 'cell', type: 'uint16' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'coordinate', type: 'tuple' } ], name: 'from', type: 'tuple' }, { components: [ { name: 'cell', type: 'uint16' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'coordinate', type: 'tuple' } ], name: 'to', type: 'tuple' } ], name: 'playerSteps', type: 'map(address,tuple[])' } ], name: 'roundMoves', type: 'map(uint64,tuple)' },
         { name: 'playerCell', type: 'map(address,uint16)' },
         { components: [ { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'from', type: 'tuple' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'to', type: 'tuple' }, { name: 'type_', type: 'uint8' } ], name: 'cells', type: 'map(uint16,optional(tuple))' },
-        {
-            components: [
-                { name: 'rakes', type: 'uint128' },
-                { name: 'jackpot', type: 'uint128' },
-                {
-                    components: [
-                        { name: 'prize', type: 'uint128' },
-                        { name: 'entranceFee', type: 'uint128' },
-                        { name: 'playerJackpot', type: 'map(address,uint128)' } ],
-                    name: 'roundTreasury',
-                    type: 'map(uint64,tuple)'
-                } ],
-            name: 'boardTreasury',
-            type: 'tuple'
-        }
+        { components: [ { name: 'rakes', type: 'uint128' }, { name: 'jackpot', type: 'uint128' }, { components: [ { name: 'prize', type: 'uint128' }, { name: 'entranceFee', type: 'uint128' }, { name: 'playerJackpot', type: 'map(address,uint128)' } ], name: 'roundTreasury', type: 'map(uint64,tuple)' } ], name: 'boardTreasury', type: 'tuple' }
     ]
 } as const

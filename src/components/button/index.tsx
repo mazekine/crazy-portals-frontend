@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { MouseEventHandler, useEffect } from 'react'
 
+import { Oval } from 'react-loader-spinner'
 import './style.css'
 
 interface MainProps {
@@ -7,6 +8,8 @@ interface MainProps {
     size?: 'm' | 'l',
     children?: any,
     stretched?: boolean,
+    load?: boolean,
+    onClick?: MouseEventHandler<HTMLButtonElement>
     [x: string]: any
 }
 
@@ -15,6 +18,8 @@ export const Button: React.FC<MainProps> = ({
     size = 'l',
     children,
     stretched = false,
+    load = false,
+    onClick = () => null,
     ...restProps
 }: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
@@ -27,8 +32,21 @@ export const Button: React.FC<MainProps> = ({
 
     return (
         <button {...restProps} className={
-            `btn ${type}-btn ${size}-btn ${stretched ? 'stretched-btn' : ''}`
-        }>
+            `btn ${type}-btn ${size}-btn ${stretched ? 'stretched-btn' : ''} ${load ? 'load-btn' : ''}`
+        } onClick={!load ? onClick : () => null}>
+            {load ? <Oval
+                height={14}
+                width={14}
+                color="#fff"
+                wrapperStyle={{}}
+                wrapperClass=""
+                visible={true}
+                ariaLabel='oval-loading'
+                secondaryColor="#eee"
+                strokeWidth={4}
+                strokeWidthSecondary={4}
+
+            /> : null}
             {children}
         </button>
     )

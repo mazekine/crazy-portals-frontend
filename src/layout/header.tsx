@@ -110,7 +110,7 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
                         onClick={() => history('/boards')}
                     >Boards</Button>
                     <Button type="tentery" style={{ margin: '0 16px 0 16px' }}>How to play</Button>
-                    <Button type="tentery" style={{ margin: '0 16px 0 16px' }}>Get EVER</Button>
+                    {/* <Button type="tentery" style={{ margin: '0 16px 0 16px' }}>Get EVER</Button> */}
                 </div> : null }
 
         </Header>

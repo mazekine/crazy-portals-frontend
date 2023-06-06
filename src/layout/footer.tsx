@@ -53,8 +53,8 @@ export const FooterBlock: React.FC<FooterProps> = (props: FooterProps) => {
                             <h3>Support</h3>
 
                             <Link >How to play</Link>
-                            <Link >What is Everscale</Link>
-                            <Link >Get EVER</Link>
+                            {/* <Link >What is Everscale</Link> */}
+                            {/* <Link >Get EVER</Link> */}
                             <Link >FAQ</Link>
 
                         </div>
@@ -62,7 +62,7 @@ export const FooterBlock: React.FC<FooterProps> = (props: FooterProps) => {
                     </div>
 
                     <div className="buttons">
-                        <Button stretched type="outline" size="m">Install EVER Wallet</Button>
+                        {/* <Button stretched type="outline" size="m">Install EVER Wallet</Button> */}
                         <Button stretched type="outline" size="m">Source code on GitHub</Button>
 
                     </div>
