@@ -482,7 +482,7 @@ class Game {
 
             const data = await getData.send({
                 from: this._wallet.account.address,
-                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                amount: new BigNumber(0.2).shiftedBy(9).toFixed(0),
                 bounce: true
             })
 
@@ -511,7 +511,7 @@ class Game {
 
             const data = await getData.send({
                 from: this._wallet.account.address,
-                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                amount: new BigNumber(0.2).shiftedBy(9).toFixed(0),
                 bounce: true
             })
 
@@ -542,7 +542,7 @@ class Game {
 
             const data = await getData.send({
                 from: this._wallet.account.address,
-                amount: new BigNumber(1).shiftedBy(9).toFixed(0),
+                amount: new BigNumber(0.3).shiftedBy(9).toFixed(0),
                 bounce: true
             })
 
@@ -710,6 +710,7 @@ class Game {
             return undefined
         }
     }
+    
 
     public async getAllInfoGames (addresses: Address[]): Promise<InfoGames[] | undefined> {
         const allInfo = []
