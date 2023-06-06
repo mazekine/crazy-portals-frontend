@@ -110,7 +110,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             if (i === distance) {
                 clearInterval(intr)
                 setAnimation(false)
-                setWaitCount(waitCount - 1)
+                // setWaitCount(waitCount - 1)
                 return
             }
 
@@ -121,6 +121,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             setPlayersRound2(listPlayers)
 
             console.log('playerIndex i', i, updatePlayer.number)
+
+            setWaitCount(waitCount - 1 < 0 ? 0 : waitCount - 1)
 
             i++
         }, distance > 6 ? 200 : 1000)
