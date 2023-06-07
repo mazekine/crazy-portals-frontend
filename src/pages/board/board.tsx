@@ -65,7 +65,6 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
         return true
     }
 
-
     useEffect(() => {
         if (!firstRender && props.infoGame && props.infoGame.info && address) {
             setFirstRender(true)
@@ -101,7 +100,10 @@ export const BoardBlock: React.FC<MainProps> = (props: MainProps) => {
                                 {y.type === 'win' ? <img src={corona} /> : y.number}
                                 <div className="players">
                                     {props.playersRound ? props.playersRound.map((p, key5) => (
-                                        p.number === y.number ? <div key={key5} className={'player in-' + key5 }></div> : null
+                                        p.number === y.number ? <div key={key5}><div
+                                            className={'player in-' + key5 + ' a-' + p.address.toString().replace(':', '') }></div>
+                                        <div className={'move in-' + key5 } id={p.address.toString()}></div>
+                                        </div> : null
                                     )) : null}
                                 </div>
                                 {

@@ -252,17 +252,38 @@ class Game {
                 portals: [
                     {
                         number: this.getNumberFromXY(Number(beam[i].from.x), Number(beam[i].from.y), size),
-                        position: [Number(beam[i].from.x), Number(beam[i].from.y)]
+                        position: [ Number(beam[i].from.x), Number(beam[i].from.y) ]
                     },
                     {
                         number: this.getNumberFromXY(Number(beam[i].to.x), Number(beam[i].to.y), size),
-                        position: [Number(beam[i].to.x), Number(beam[i].to.y)]
+                        position: [ Number(beam[i].to.x), Number(beam[i].to.y) ]
                     }
                 ]
             })
         }
 
         return portal
+    }
+
+    public static genMovePlayer (from: { x: number, y: number }, to: { x: number, y: number }): { rotate: number, distance: number } {
+        const sizePixel = 46
+        const aX = from.x * sizePixel - (sizePixel / 2)
+        const aY = from.y * sizePixel - (sizePixel / 2)
+
+        const bX = to.x * sizePixel - (sizePixel / 2)
+        const bY = to.y * sizePixel - (sizePixel / 2)
+
+        const abY = aY - bY
+        const abX = aX - bX
+        const an =  Math.atan2(abY, abX)
+
+        const rotate = -((an * 180) / Math.PI)
+        const distance = Math.sqrt((aX - bX) ** 2 + (aY - bY) ** 2)
+
+        return {
+            rotate,
+            distance
+        }
     }
 
     public static genArrBoard (size: number, _portals: Beam[]): [ObjPixel[][], Portal[]] {
@@ -739,7 +760,6 @@ class Game {
             return undefined
         }
     }
-
 
     public async getAllInfoGames (addresses: Address[]): Promise<InfoGames[] | undefined> {
         const allInfo = []

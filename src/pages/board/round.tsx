@@ -31,7 +31,9 @@ interface MainProps {
 interface AnimationWait {
     address: string,
     from: number,
-    to: number
+    to: number,
+    fromO: { x: string, y: string },
+    toO: { x: string, y: string }
 }
 
 export const Round: React.FC<MainProps> = (props: MainProps) => {
@@ -57,6 +59,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     const  [ animationWait, setAnimationWait ] = React.useState<AnimationWait[]>([])
     const  [ waitCount, setWaitCount ] = React.useState<number>(0)
 
+    const  [ waitFirst, setWaitFirst ] = React.useState<boolean>(false)
+
     const { address, round } = useParams()
     const history = useNavigate()
 
@@ -79,7 +83,14 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         }, interval)
     }
 
-    function playerGo (fromN: number, toN: number, address2: string, playersRound3: Player[]) {
+    function playerGo (
+        fromN: number,
+        toN: number,
+        address2: string,
+        playersRound3: Player[],
+        fromO: { x: number, y: number },
+        toO: { x: number, y: number }
+    ) {
         if (!playersRound3) {
             console.log('playerGo not start')
             return undefined
@@ -104,28 +115,47 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             return undefined
         }
 
-        let i = 0
+        const i = 0
         const updatePlayer = playersRound3[playerIndex]
-        const intr = setInterval(() => {
-            if (i === distance) {
-                clearInterval(intr)
-                setAnimation(false)
-                // setWaitCount(waitCount - 1)
-                return
-            }
+        // const intr = setInterval(() => {
+        //     if (i === distance) {
+        //         clearInterval(intr)
+        //         setAnimation(false)
+        //         // setWaitCount(waitCount - 1)
+        //         return
+        //     }
 
-            updatePlayer.number = moveToUp ? Number(fromN) + 1 + i : Number(fromN) - 1 + i
+        //     updatePlayer.number = moveToUp ? Number(fromN) + 1 + i : Number(fromN) - 1 + i
+        //     const listPlayers = playersRound3
+        //     listPlayers[playerIndex] = updatePlayer
+
+        //     setPlayersRound2(listPlayers)
+
+        //     console.log('playerIndex i', i, updatePlayer.number)
+
+        //     setWaitCount(waitCount - 1 < 0 ? 0 : waitCount - 1)
+
+        //     i++
+        // }, 1000 / distance)
+
+        document.querySelector('.a-' + address2.replace(':', ''))?.setAttribute('style', 'opacity: 0')
+        setTimeout(() => {
+            updatePlayer.number = toN
             const listPlayers = playersRound3
             listPlayers[playerIndex] = updatePlayer
 
             setPlayersRound2(listPlayers)
-
-            console.log('playerIndex i', i, updatePlayer.number)
-
             setWaitCount(waitCount - 1 < 0 ? 0 : waitCount - 1)
+            document.querySelector('.a-' + address2.replace(':', ''))?.setAttribute('style', 'opacity: 1')
 
-            i++
-        }, distance > 6 ? 200 : 1000)
+            setAnimation(false)
+        }, 550)
+        const positionX = toO.x - fromO.x
+        const positionY = fromO.y - toO.y // fix transform
+        const styleText = `transform: translateY(${positionY * 44}px) translateX(${positionX * 44}px);opacity: 1`
+        document.getElementById(address2)?.setAttribute('style', styleText)
+        console.log('styleText', styleText)
+        console.log('address2', document.getElementById(address2))
         return true
     }
 
@@ -234,22 +264,34 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }
 
     useEffect(() => {
-        if (animationWait.length > 0 && playersRound2) {
+        console.log('animationWait length', animationWait)
+        if (animationWait.length > 0 && playersRound2 && !animation) {
             console.log('waitCount', waitCount)
-            let waitCountLocal = 0
-            for (let i = waitCount; i < animationWait.length; i++) {
-                delayCb(i * 1000, () => playerGo(
-                    animationWait[i].from,
-                    animationWait[i].to,
-                    animationWait[i].address,
-                    playersRound2
-                ))
-                waitCountLocal += Math.abs(animationWait[i].from - animationWait[i].to)
+            // let waitCountLocal = 0
+            if (waitFirst) {
+                for (let i = waitCount; i < animationWait.length; i++) {
+                    console.log('animationWait', animationWait)
+                    delayCb(i * 1000, () => playerGo(
+                        animationWait[i].from,
+                        animationWait[i].to,
+                        animationWait[i].address,
+                        playersRound2,
+                        { x: Number(animationWait[i].fromO.x), y: Number(animationWait[i].fromO.y) },
+                        { x: Number(animationWait[i].toO.x), y: Number(animationWait[i].toO.y) }
+                    ))
+                // waitCountLocal += Math.abs(animationWait[i].from - animationWait[i].to)
+                }
+                setWaitCount(waitCount + animationWait.length)
+                setAnimationWait([])
+
+                setWaitFirst(false)
+            } else {
+                setTimeout(() => {
+                    setWaitFirst(true)
+                }, 1000)
             }
-            setWaitCount(waitCount + waitCountLocal)
-            setAnimationWait([])
         }
-    }, [ animationWait ])
+    }, [ animationWait, animation, waitFirst ])
 
     useEffect(() => {
         if (!firstRender
@@ -268,34 +310,33 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             setFirstRender2(true)
             const addr = new Address(address)
 
-            game.onEvents(addr, (ev: ContractEvents, data: any, playersRound3 = playersRound2) => {
+            game.onEvents(addr, (ev: ContractEvents, data: any, animationWait2 = animationWait) => {
                 if (ev === 'PlayerMoved' || ev === 'PlayerRemovedFromRound' || ev === 'RoundFinished' || ev === 'RoundJoined') {
                     if (data.round === round) {
                         if (ev === 'PlayerMoved') {
                             const typedData = data as PlayerMoved
 
-                            setAnimationWait([ ...animationWait, {
-                                address: typedData.player.toString(),
-                                from: Number(typedData.from.cell),
-                                to: Number(typedData.to.cell)
-
-                            } ])
-                            setTimeout(() => {
-                                // playerGo(
-                                //     Number(typedData.from.cell),
-                                //     Number(typedData.to.cell),
-                                //     typedData.player.toString(),
-                                //     playersRound3
-                                // )
-                            }, animation ? 1000 : 0)
+                            if (Number(typedData.from.cell) === 0) {
+                                setTimeout(() => {
+                                    getPlayers(addr, false)
+                                }, 500)
+                            } else {
+                                console.log('setAnimationWait', animationWait2)
+                                setAnimationWait(a => [ ...a, {
+                                    address: typedData.player.toString(),
+                                    from: Number(typedData.from.cell),
+                                    to: Number(typedData.to.cell),
+                                    fromO: typedData.from.coordinate,
+                                    toO: typedData.to.coordinate
+                                } ])
+                            }
                         }
 
                         if (ev === 'RoundJoined') {
-                            getPlayers(addr, true)
+                            setTimeout(() => {
+                                getPlayers(addr, true)
+                            }, 500)
                         }
-                        // setTimeout(() => {
-                        //     getPlayers(addr)
-                        // }, 500)
                     }
                 }
 
@@ -462,7 +503,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                             ? props.venomWallet?.address : props.everWallet.account?.address.toString()
                                     )
                                 ) > -1
-                                    ? <div style={{ width: '100%'}}>
+                                    ? <div style={{ width: '100%' }}>
                                         <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
                                         {thisRound.giveUpAllowed
                                             ? <Button
@@ -470,7 +511,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                                 stretched
                                                 type="outline"
                                                 size="m"
-                                                style={{marginTop: '30px'}}
+                                                style={{ marginTop: '30px' }}
                                             >Give Up</Button> : null }
                                     </div>
                                     : <Button onClick={() => joinRound()} stretched load={props.load1}>Join</Button> }

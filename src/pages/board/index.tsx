@@ -156,7 +156,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {infoGame.rounds && [ ...infoGame.rounds._rounds ].reverse().map((r, key) => (
+                                        {infoGame.rounds && [ ...infoGame.rounds._rounds ].reverse().slice(0, 10).map((r, key) => (
                                             <tr
                                                 key={key}
                                                 onClick={() => history('/boards/' + address + '/' + r.id)}

@@ -73,6 +73,7 @@
 .board {
     /* width: 472px;
     height: 472px; */
+    position: relative;
 }
 
 .board .line {
@@ -207,6 +208,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+   
+}
+.players > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .player {
     width: 6px;
@@ -217,31 +224,40 @@
 .player:last-child {
     margin-right: 0px;
 }
-.player.in-0 {
+.player.in-0,
+.move.in-0 {
     background-color: #BB6BD9;
 }
-.player.in-1 {
+.player.in-1,
+.move.in-1 {
     background-color: #56CCF2;
 }
-.player.in-2 {
+.player.in-2,
+.move.in-2 {
     background-color: #EB5757;
 }
-.player.in-3 {
+.player.in-3,
+.move.in-3 {
     background-color: #0075C7;
 }
-.player.in-4 {
+.player.in-4,
+.move.in-4 {
     background-color: #FF8A7A;
 }
-.player.in-5 {
+.player.in-5,
+.move.in-5 {
     background-color: #A8C8FD;
 }
-.player.in-6 {
+.player.in-6,
+.move.in-6 {
     background-color: #9FB9CC;
 }
-.player.in-7 {
+.player.in-7,
+.move.in-7 {
     background-color: #4AB44A;
 }
-.player.in-8 {
+.player.in-8,
+.move.in-8 {
     background-color: #B28501;
 }
 
@@ -303,4 +319,20 @@
     align-items: center;
     justify-content: start;
     flex-direction: column;
+}
+
+.players .move {
+    display: block;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50px;
+    margin-right: 2px;
+    transition: transform 0.5s;
+
+    z-index: 30;
+
+    bottom: 0px;
+    left: 0px;
+    opacity: 0;
 }
