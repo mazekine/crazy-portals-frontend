@@ -2,6 +2,7 @@ import React, { MouseEventHandler, useEffect } from 'react'
 
 import { Oval } from 'react-loader-spinner'
 import './style.css'
+import { Icon } from 'components'
 
 interface MainProps {
     type?: 'default' | 'outline' | 'secondory' | 'tentery',
@@ -9,7 +10,8 @@ interface MainProps {
     children?: any,
     stretched?: boolean,
     load?: boolean,
-    onClick?: MouseEventHandler<HTMLButtonElement>
+    onClick?: MouseEventHandler<HTMLButtonElement>,
+    icon?: any
     [x: string]: any
 }
 
@@ -20,6 +22,7 @@ export const Button: React.FC<MainProps> = ({
     stretched = false,
     load = false,
     onClick = () => null,
+    icon,
     ...restProps
 }: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
@@ -46,7 +49,7 @@ export const Button: React.FC<MainProps> = ({
                 strokeWidth={4}
                 strokeWidthSecondary={4}
 
-            /> : null}
+            /> : icon}
             {children}
         </button>
     )

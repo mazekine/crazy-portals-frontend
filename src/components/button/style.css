@@ -3,6 +3,10 @@
     box-sizing: border-box;
     cursor: pointer;
     width: fit-content;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn:hover {
@@ -47,9 +51,12 @@
 }
 
 .m-btn {
-    padding: 12px 14px;
+    padding: 5px 16px;
     border-radius: 4px;
     font-size: 13px;
+
+    height: 36px!important;
+    box-sizing: border-box;
 }
 
 .stretched-btn {

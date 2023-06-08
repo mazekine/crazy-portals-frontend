@@ -4,13 +4,16 @@ import { useNavigate, useParams } from 'react-router-dom'
 import './style.css'
 import { Address } from 'everscale-inpage-provider'
 import moment from 'moment'
-import { Panel, Div, Button, Link } from '../../components'
+import { Panel, Div, Button, Link, Icon } from '../../components'
 
 import chery from '../../img/chery.svg'
 import win1 from '../../img/win.svg'
 import win2 from '../../img/win2.svg'
+import win3 from '../../img/win3.svg'
+import arrow from '../../img/arrow.svg'
+import reload from '../../img/reload.svg'
 import { addStr, delay, weiToEth } from '../../logic/utils'
-import { ContractEvents, Game, InfoGames, ObjPixel, Player, PlayerMoved, VenomWallet, Round as Round2 } from '../../logic/game'
+import { ContractEvents, Game, InfoGames, ObjPixel, Player, PlayerMoved, VenomWallet, Round as Round2, DiceRolled, PrizeClaimed } from '../../logic/game'
 
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
@@ -34,6 +37,11 @@ interface AnimationWait {
     to: number,
     fromO: { x: string, y: string },
     toO: { x: string, y: string }
+}
+
+interface Action {
+    text: string,
+    type_you: boolean
 }
 
 export const Round: React.FC<MainProps> = (props: MainProps) => {
@@ -60,6 +68,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     const  [ waitCount, setWaitCount ] = React.useState<number>(0)
 
     const  [ waitFirst, setWaitFirst ] = React.useState<boolean>(false)
+
+    const  [ actions, setActions ] = React.useState<Action[]>([])
+
+    const  [ winData, setWinData ] = React.useState<string | undefined>(undefined)
 
     const { address, round } = useParams()
     const history = useNavigate()
@@ -148,8 +160,9 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             setWaitCount(waitCount - 1 < 0 ? 0 : waitCount - 1)
             document.querySelector('.a-' + address2.replace(':', ''))?.setAttribute('style', 'opacity: 1')
 
+            document.getElementById(address2)?.setAttribute('style', '')
             setAnimation(false)
-        }, 550)
+        }, 650)
         const positionX = toO.x - fromO.x
         const positionY = fromO.y - toO.y // fix transform
         const styleText = `transform: translateY(${positionY * 44}px) translateX(${positionX * 44}px);opacity: 1`
@@ -164,22 +177,24 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         cb()
     }
 
-    async function getPlayers (address1: Address, update: boolean = false) {
+    async function getPlayers (address1: Address, update: boolean = false, playersRound3 = playersRound2) {
         if (!game) {
             console.log('error getPlayers')
             return undefined
         }
         const players3 = await game.getPlayersForRound(address1, round ?? '')
 
-        if (update && playersRound2) {
-            for (let i = 0; i < playersRound2.length; i++) {
-                const ind = playersRound2?.findIndex(p => p.address.toString() === playersRound2[i].address.toString())
+        if (update && playersRound3) {
+            for (let i = 0; i < playersRound3.length; i++) {
+                const ind = playersRound3?.findIndex(p => p.address.toString() === playersRound3[i].address.toString())
                 if (ind === -1) {
+                    console.log('new player')
                     setPlayersRound2(players3)
                 }
             }
         }
-        if (!playersRound2 || !update) {
+        if (!playersRound3 || !update) {
+            console.log('update !playersRound2 || !update', playersRound3, update)
             setPlayersRound2(players3)
         }
         return true
@@ -263,6 +278,18 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         return true
     }
 
+    async function addAction (test: string, type_you: boolean) {
+        const text = type_you ? 'You ' + test.slice(19, test.length) : test
+        setActions(act => [ ...act, {
+            text,
+            type_you
+        } ])
+    }
+
+    function isAddr (addr: Address) {
+        return addr.toString() === props.venomWallet?.address
+    }
+
     useEffect(() => {
         console.log('animationWait length', animationWait)
         if (animationWait.length > 0 && playersRound2 && !animation) {
@@ -310,45 +337,86 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             setFirstRender2(true)
             const addr = new Address(address)
 
-            game.onEvents(addr, (ev: ContractEvents, data: any, animationWait2 = animationWait) => {
-                if (ev === 'PlayerMoved' || ev === 'PlayerRemovedFromRound' || ev === 'RoundFinished' || ev === 'RoundJoined') {
-                    if (data.round === round) {
-                        if (ev === 'PlayerMoved') {
-                            const typedData = data as PlayerMoved
+            game.onEvents(addr, (ev: ContractEvents, data: any, animationWait2 = animationWait, playersRound3 = playersRound2) => {
+                if (data.round === round || data.roundId === round) {
+                    if (ev === 'PlayerMoved') {
+                        const typedData = data as PlayerMoved
 
-                            if (Number(typedData.from.cell) === 0) {
-                                setTimeout(() => {
-                                    getPlayers(addr, false)
-                                }, 500)
-                            } else {
-                                console.log('setAnimationWait', animationWait2)
-                                setAnimationWait(a => [ ...a, {
-                                    address: typedData.player.toString(),
-                                    from: Number(typedData.from.cell),
-                                    to: Number(typedData.to.cell),
-                                    fromO: typedData.from.coordinate,
-                                    toO: typedData.to.coordinate
-                                } ])
-                            }
-                        }
-
-                        if (ev === 'RoundJoined') {
+                        if (Number(typedData.from.cell) === 0) {
                             setTimeout(() => {
-                                getPlayers(addr, true)
+                                getPlayers(addr, false, playersRound3)
                             }, 500)
+                        } else {
+                            console.log('setAnimationWait', animationWait2)
+                            // setAnimation(true)
+                            setAnimationWait(a => [ ...a, {
+                                address: typedData.player.toString(),
+                                from: Number(typedData.from.cell),
+                                to: Number(typedData.to.cell),
+                                fromO: typedData.from.coordinate,
+                                toO: typedData.to.coordinate
+                            } ])
                         }
+
+                        addAction(
+                            `Player ${addStr(typedData.player.toString())} moves to cell ${typedData.to.cell}`,
+                            isAddr(typedData.player)
+                        )
+                    }
+
+                    if (ev === 'RoundJoined') {
+                        const typedData = data as PlayerMoved
+                        setTimeout(() => {
+                            getPlayers(addr, true, playersRound3)
+                        }, 500)
+
+                        addAction(`Player ${addStr(typedData.player.toString())} joined the round`, isAddr(typedData.player))
                     }
                 }
 
                 if (ev === 'RoundFinished') {
-                    if (data.roundId === round) {
-                        console.log('Finish!!!')
-                        if (data.winner.toString() === props.venomWallet?.address) {
-                            setWin(3)
-                        } else {
-                            setWin(1)
-                        }
+                    console.log('Finish!!!')
+                    if (data.winner.toString() === props.venomWallet?.address) {
+                        setWin(1)
+                        setWinData(data.amount)
+                    } else {
+                        setWin(3)
                     }
+                }
+
+                if (ev === 'DiceRolled') {
+                    const typedData = data as DiceRolled
+                    addAction(`Player ${addStr(typedData.player.toString())} rolled ${typedData.dice}`, isAddr(typedData.player))
+                }
+
+                if (ev === 'PlayerWon') {
+                    const typedData = data as DiceRolled
+                    addAction(`Player ${addStr(typedData.player.toString())} has won!`, isAddr(typedData.player))
+                }
+
+                if (ev === 'JackpotDrawn') {
+                    const typedData = data as PrizeClaimed
+                    addAction(
+                        `Player ${addStr(typedData.player.toString())} won jackpot of ${weiToEth(typedData.amount, 9)} VENOM`,
+                        isAddr(typedData.player)
+                    )
+                    setWin(4)
+
+                    setWinData(typedData.amount)
+                }
+                if (ev === 'PrizeClaimed') {
+                    const typedData = data as PrizeClaimed
+                    addAction(
+                        `Player ${addStr(typedData.player.toString())} has claimed the prize of ${weiToEth(typedData.amount, 9)} VENOM`,
+                        isAddr(typedData.player)
+                    )
+                }
+                if (ev === 'JackpotClaimed') {
+                    const typedData = data as PrizeClaimed
+                    addAction(
+                        `Player ${addStr(typedData.player.toString())} has claimed the jackpot of ${weiToEth(typedData.amount, 9)} VENOM`,
+                        isAddr(typedData.player)
+                    )
                 }
             })
 
@@ -369,22 +437,22 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.venomWallet ])
 
     useEffect(() => {
-        if (address && round && game && !animation && !interval2) {
+        if (address && round && game && !animation && !interval2 && animationWait.length === 0 && playersRound2 !== undefined) {
             console.log('===start update')
-            const int = setInterval(() => {
+            const int = setInterval((playersRound3 = playersRound2) => {
                 console.log('update', !animation)
-                // getPlayers(new Address(address), true)
-            }, 2000)
+                getPlayers(new Address(address), true, playersRound3)
+            }, 2600)
 
             setInterval2(int)
 
             // return () => clearInterval(int)
-        } if (interval2 && animation) {
+        } if (interval2 && (animation || animationWait.length !== 0)) {
             console.log('===stop update')
             clearInterval(interval2)
             setInterval2(undefined)
         }
-    }, [ animation, address, game, round, interval2 ])
+    }, [ animation, address, game, round, interval2, animationWait, playersRound2 ])
 
     useEffect(() => {
         if (game && props.typeNetwork === 'ever') game.sunc(props.everWallet)
@@ -392,27 +460,26 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
-        if (address && game && round) {
-            // setFirstRender2(true)
-            const addr = new Address(address)
-
-            getInfo([ addr ])
-        }
-    }, [ address, game, round ])
-
-    useEffect(() => {
         console.log('update playersRound2', playersRound2)
     }, [ playersRound2 ])
 
     useEffect(() => {
-        if (address && round) {
+        if (address && round && game) {
             getInfo([ new Address(address) ])
+
+            // setWin(1)
+        }
+    }, [ address, game, round ])
+
+    useEffect(() => {
+        if (address && round) {
+            // getInfo([ new Address(address) ])
 
             // setWin(1)
         } else {
             history('/boards')
         }
-    }, [ address ])
+    }, [ address, round ])
 
     return (
         <Panel id={props.id}>
@@ -437,7 +504,9 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             </div>
 
                             <div className="group-block">
-                                <div className="cell">Anonymous capybara rolled moves 3 steps</div>
+                                {actions.map((act, key) => (
+                                    <div className={'cell' + (act.type_you ? ' black' : '')} key={key}>{act.text}</div>
+                                ))}
 
                             </div>
 
@@ -491,33 +560,41 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '60%' }} >
-                                {/* {props.typeNetwork === 'venom' && props.venomWallet && props.venomWallet.address ?
-                                    playersRound2.findIndex(p => p.address.toString() === props.venomWallet.address) !== -1 ?
-                                    <Button onClick={() => startRoll()}>Roll</Button>
-                                : null} */}
-
-                                {playersRound2.findIndex(
+                            {Number(thisRound.maxPlayers) === playersRound2.length && (
+                                playersRound2.findIndex(
                                     p => p.address.toString() === (
                                         props.typeNetwork === 'venom'
                                             ? props.venomWallet?.address : props.everWallet.account?.address.toString()
                                     )
-                                ) > -1
-                                    ? <div style={{ width: '100%' }}>
-                                        <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
-                                        {thisRound.giveUpAllowed
-                                            ? <Button
-                                                onClick={() => giveUp()}
-                                                stretched
-                                                type="outline"
-                                                size="m"
-                                                style={{ marginTop: '30px' }}
-                                            >Give Up</Button> : null }
-                                    </div>
-                                    : <Button onClick={() => joinRound()} stretched load={props.load1}>Join</Button> }
-                                {/* <Button onClick={() => joinRound()}>Join</Button>
+                                ) === -1
+                            ) ? null
+                                : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '60%' }} >
+                                    {/* {props.typeNetwork === 'venom' && props.venomWallet && props.venomWallet.address ?
+                                    playersRound2.findIndex(p => p.address.toString() === props.venomWallet.address) !== -1 ?
+                                    <Button onClick={() => startRoll()}>Roll</Button>
+                                : null} */}
+
+                                    {playersRound2.findIndex(
+                                        p => p.address.toString() === (
+                                            props.typeNetwork === 'venom'
+                                                ? props.venomWallet?.address : props.everWallet.account?.address.toString()
+                                        )
+                                    ) > -1
+                                        ? <div style={{ width: '100%' }}>
+                                            <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
+                                            {thisRound.giveUpAllowed
+                                                ? <Button
+                                                    onClick={() => giveUp()}
+                                                    stretched
+                                                    type="outline"
+                                                    size="m"
+                                                    style={{ marginTop: '30px' }}
+                                                >Give Up</Button> : null }
+                                        </div>
+                                        : <Button onClick={() => joinRound()} stretched load={props.load1}>Join</Button> }
+                                    {/* <Button onClick={() => joinRound()}>Join</Button>
                                 <Button onClick={() => startRoll()}>Roll</Button> */}
-                            </div>
+                                </div> }
 
                         </div>
 
@@ -529,13 +606,53 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             <div className="in-block-img">
                                 <img src={win1} />
                                 <h3 className='raider-font' style={{ textAlign: 'center' }}>You are the winner!</h3>
-                                <Button onClick={() => claim()} stretched>Claim reward</Button>
+                                <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
+                                <small>Reward: {weiToEth(winData, 9)} VENOM Gas: ~0.06 VENOM</small>
                             </div>
                         </div>
                         <div className="tre-btn">
-                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
+                            <Button
+                                onClick={() => history('/boards/' + address)}
+                                stretched
+                                type="secondory"
+                                icon={<Icon src={arrow} size={20}/>}
+                            >Back</Button>
                             <Button onClick={() => null} stretched type="secondory">Stats</Button>
-                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
+                            <Button
+                                onClick={() => history('/boards/' + address)}
+                                stretched
+                                type="secondory"
+                                icon={<Icon src={reload} size={20}/>}
+                            >Replay</Button>
+
+                        </div>
+                    </div>
+                </div> : null}
+
+                {win === 4 ? <div className="page-block" style={{ justifyContent: 'center' }}>
+                    <div className="center-block" >
+                        <div className="block-img">
+                            <div className="in-block-img">
+                                <img src={win3} />
+                                <h3 className='raider-font' style={{ textAlign: 'center' }}>Jackpot!</h3>
+                                <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
+                                <small>Jackpot: {weiToEth(winData, 9)} VENOM Gas: ~0.06 VENOM</small>
+                            </div>
+                        </div>
+                        <div className="tre-btn">
+                            <Button
+                                onClick={() => history('/boards/' + address)}
+                                stretched
+                                type="secondory"
+                                icon={<Icon src={arrow} size={20}/>}
+                            >Back</Button>
+                            <Button onClick={() => null} stretched type="secondory">Stats</Button>
+                            <Button
+                                onClick={() => history('/boards/' + address)}
+                                stretched
+                                type="secondory"
+                                icon={<Icon src={reload} size={20}/>}
+                            >Replay</Button>
 
                         </div>
                     </div>
@@ -551,9 +668,18 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             </div>
                         </div>
                         <div className="tre-btn">
-                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Back</Button>
+                            <Button
+                                onClick={() => history('/boards/' + address)}
+                                stretched
+                                type="secondory"
+                                icon={<Icon src={arrow} size={20}/>}>Back</Button>
                             <Button onClick={() => null} stretched type="secondory">Stats</Button>
-                            <Button onClick={() => history('/boards/' + address)} stretched type="secondory">Replay</Button>
+                            <Button
+                                onClick={() => history('/boards/' + address)}
+                                stretched
+                                type="secondory"
+                                icon={<Icon src={reload} size={20}/>}
+                            >Replay</Button>
 
                         </div>
                     </div>

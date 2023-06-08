@@ -18,12 +18,6 @@ export function weiToEth (nanoAmount: bigint | string | BigNumberish | undefined
     if (Number(stringAmount) === 0) {
         stringAmount = Number(amount).toPrecision(3)
     }
-    if (Number(stringAmount) === 0) {
-        stringAmount = Number(amount).toPrecision(4)
-    }
-    if (Number(stringAmount) === 0) {
-        stringAmount = Number(amount).toPrecision(5)
-    }
 
     if (Number(stringAmount) === 0) {
         stringAmount = Number(amount).toFixed(1)

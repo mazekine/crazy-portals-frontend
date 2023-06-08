@@ -187,7 +187,7 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                     justifyContent: 'center',
                                     marginTop: '16px'
                                 }}>
-                                    <Button onClick={() => newRound()} load={props.load1}>New round</Button>
+                                    <Button onClick={() => newRound()} load={props.load1} size="m">New round</Button>
                                 </div>
 
                             </div>

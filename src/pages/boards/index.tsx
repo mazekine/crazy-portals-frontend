@@ -83,7 +83,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                 </div>
 
                 <div className="page-block" style={props.isMobile ? { flexDirection: 'column' } : {}}>
-                    {props.isMobile ? null : <div className="left-menu">
+                    {props.isMobile || true ? null : <div className="left-menu">
                         <div className="title-bar">
                             <h3 className='raider-font'>Board of the Day</h3>
                             <div className="right-bar">
@@ -148,7 +148,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                         </div>
 
                     </div>}
-                    <div className="content-block" style={props.isMobile ? { width: '99%' } : {}}>
+                    <div className="content-block" style={props.isMobile ? { width: '99%' } : { width: '100%' }}>
 
                         <div className="title-bar">
                             <h3 className='raider-font'>All boards</h3>

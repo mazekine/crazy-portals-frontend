@@ -40,7 +40,22 @@ export interface PlayerMoved {
             y: string
         }
     }
-
+}
+export interface DiceRolled {
+    player: Address,
+    dice: string
+}
+export interface PrizeClaimed {
+    player: Address,
+    board: Address,
+    roundId: string,
+    amount: string
+}
+export interface RoundLatestMove {
+    move: {
+        expiresAt: string,
+        playerSteps: any
+    }
 }
 interface ParamConstruct {
     address: string,
@@ -149,6 +164,10 @@ export type ContractEvents = 'RoundCreated'
 | 'PlayerMoved'
 | 'PlayerWon'
 | 'PlayerRemovedFromRound'
+| 'DiceRolled'
+| 'PrizeClaimed'
+| 'JackpotClaimed'
+| 'JackpotDrawn'
 
 // const portals: Portal[] = [
 //     {
@@ -743,6 +762,25 @@ class Game {
             return undefined
         }
     }
+
+    // public async getRoundLatestMove (address: Address, round: string): Promise<RoundLatestMove | undefined> {
+    //     if (!this._wallet || !this._wallet.provider) {
+    //         console.log('error getRoundLatestMove')
+    //         return undefined
+    //     }
+
+    //     const contractGame = new this._wallet.provider.Contract(abi, address)
+
+    //     try {
+    //         const data = contractGame.methods.getRoundLatestMove({ answerId: 0, roundId: round } as never)
+
+    //         console.log('getPlayerCell', data)
+    //         return data
+    //     } catch (error) {
+    //         console.log('getPlayerCell', error)
+    //         return undefined
+    //     }
+    // }
 
     public async getBalance (address: Address): Promise<string | undefined> {
         if (!this._wallet || !this._wallet.provider) {
