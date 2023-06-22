@@ -617,7 +617,6 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 </div> }
 
                         </div>
-                        
 
                     </div> : null }
 
