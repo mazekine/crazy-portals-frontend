@@ -38,6 +38,15 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
         props.venomProvider?.disconnect()
     }
 
+    function changeNetwork (e:  React.ChangeEvent<HTMLSelectElement>) {
+        props.setTypeNetwork(e.target.value)
+
+        history('/')
+        setTimeout(() => {
+            history('/boards')
+        }, 100)
+    }
+
     useEffect(() => {
         if (!firstRender) {
             setFirstRender(true)
@@ -58,12 +67,12 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
             }
             after={
                 <div className="balance-full-block">
-                    {/* <div className="change_network">
-                        <select value={props.typeNetwork} onChange={e => props.setTypeNetwork(e.target.value)}>
+                    <div className="change_network">
+                        <select value={props.typeNetwork} onChange={e => changeNetwork(e)}>
                             <option value="venom">Venom</option>
                             <option value="ever">Ever</option>
                         </select>
-                    </div> */}
+                    </div>
                     { props.typeNetwork === 'ever' ? <> {
                         props.everWallet && props.everWallet.account
                             ? <div className="balance-block">

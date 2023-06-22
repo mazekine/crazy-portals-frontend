@@ -60,7 +60,8 @@ export interface RoundLatestMove {
 interface ParamConstruct {
     address: string,
     addressUser: string,
-    wallet: EverWallet | VenomWallet | undefined
+    wallet: EverWallet | VenomWallet | undefined,
+    network: 'venom' | 'ever'
 }
 
 export interface ObjPixel {
@@ -152,6 +153,20 @@ export interface InfoGames {
 
 }
 
+interface contractHash {
+    everscale:
+    {
+        chain: 'mainnet' | 'devnet' | 'testnet',
+        contractHash: string
+    }[],
+    venom:
+    {
+        chain: 'mainnet' | 'devnet' | 'testnet',
+        contractHash: string
+    }[]
+
+}
+
 export interface Player {
     address: Address,
     number: number
@@ -211,10 +226,13 @@ class Game {
 
     private _wallet: EverWallet | VenomWallet | undefined
 
+    private _network: 'venom' | 'ever'
+
     constructor (params: ParamConstruct) {
         this._address = params.address
         this._addressUser = params.addressUser
         this._wallet = params.wallet
+        this._network = params.network
 
         console.log('_wallet', this._wallet)
     }
@@ -396,12 +414,15 @@ class Game {
         if (!this._wallet) return undefined
         if (!this._wallet.provider) return undefined
 
-        const codeHash = await axios.get('https://cpapi.mazekine.com/contractHash')
+        const codeHash = await axios.get('https://cpapi.mazekine.com/v2/contractHash')
         console.log('codeHash', codeHash)
+
         if (!codeHash.data) return undefined
+        const typedHash: contractHash = codeHash.data
+        const hash = this._network === 'venom' ? typedHash.venom[0].contractHash : typedHash.everscale[0].contractHash
         try {
             const addresses = await this._wallet.provider
-                .getAccountsByCodeHash({ codeHash: codeHash.data })
+                .getAccountsByCodeHash({ codeHash: hash })
 
             console.log('addresses.accounts', addresses.accounts)
 
@@ -853,8 +874,8 @@ class Game {
     }
 
     public onEvents (address: Address, cb: Function): true | undefined {
-        if (!this._wallet) return undefined
-        if (!this._wallet.provider) {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('onEvents error')
             return undefined
         }
 

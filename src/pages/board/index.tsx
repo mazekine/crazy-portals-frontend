@@ -4,9 +4,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import './style.css'
 import { Address } from 'everscale-inpage-provider'
 import moment from 'moment'
-import { Panel, Div, Button, Link } from '../../components'
+import { Panel, Div, Button, Link, Icon } from '../../components'
 
 import chery from '../../img/chery.svg'
+import add from '../../img/Plus.svg'
 import { addStr, toH, weiToEth } from '../../logic/utils'
 import { ContractEvents, ContractType, Game, InfoGames, ObjPixel, VenomWallet } from '../../logic/game'
 
@@ -76,7 +77,8 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
             setGame(new Game({
                 address: '',
                 addressUser: '',
-                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet
+                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet,
+                network: props.typeNetwork
             }))
         }
     }, [ props.everWallet, props.venomWallet ])
@@ -187,7 +189,12 @@ export const Board: React.FC<MainProps> = (props: MainProps) => {
                                     justifyContent: 'center',
                                     marginTop: '16px'
                                 }}>
-                                    <Button onClick={() => newRound()} load={props.load1} size="m">New round</Button>
+                                    <Button
+                                        onClick={() => newRound()}
+                                        load={props.load1}
+                                        size="m"
+                                        icon={<Icon src={add} size={16} />}
+                                    >New round</Button>
                                 </div>
 
                             </div>

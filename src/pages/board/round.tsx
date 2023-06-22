@@ -18,6 +18,7 @@ import { ContractEvents, Game, InfoGames, ObjPixel, Player, PlayerMoved, VenomWa
 import { BoardBlock } from './board'
 import { Wallet } from '../../logic/wallet'
 import { EverWallet } from '../../logic/wallet/hook'
+import { StorageGame } from '../../logic/storage'
 
 interface MainProps {
     id: string,
@@ -75,6 +76,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     const { address, round } = useParams()
     const history = useNavigate()
+
+    const storage = new StorageGame()
 
     function startTimer (date: number) {
         const eventTime = date // Timestamp - Sun, 21 Apr 2013 13:00:00 GMT
@@ -287,8 +290,15 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }
 
     function isAddr (addr: Address) {
-        return addr.toString() === props.venomWallet?.address
+        return addr.toString() === (props.typeNetwork === 'venom'
+            ? props.venomWallet?.address : props.everWallet.account?.address.toString())
     }
+
+    useEffect(() => {
+        if (actions.length > 0) {
+            storage.save('round-' + round, JSON.stringify(actions))
+        }
+    }, [ actions ])
 
     useEffect(() => {
         console.log('animationWait length', animationWait)
@@ -327,8 +337,14 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             setGame(new Game({
                 address: '',
                 addressUser: '',
-                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet
+                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet,
+                network: props.typeNetwork
             }))
+
+            const action = storage.get('round-' + round)
+            if (action && action !== '') {
+                setActions(JSON.parse(action))
+            }
         }
     }, [ props.everWallet, props.venomWallet ])
 
@@ -376,7 +392,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                 if (ev === 'RoundFinished') {
                     console.log('Finish!!!')
-                    if (data.winner.toString() === props.venomWallet?.address) {
+                    if (data.winner.toString() === (props.typeNetwork === 'venom'
+                        ? props.venomWallet?.address : props.everWallet.account?.address.toString())) {
                         setWin(1)
                         setWinData(data.amount)
                     } else {
@@ -431,10 +448,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ address, game, playersRound2, round ])
 
     useEffect(() => {
-        if (props.venomWallet?.address === undefined) {
+        if (props.typeNetwork === 'venom' ? props.venomWallet?.address === undefined : props.everWallet.account?.address === undefined) {
             setFirstRender2(false)
         }
-    }, [ props.venomWallet ])
+    }, [ props.venomWallet, props.everWallet ])
 
     useEffect(() => {
         if (address && round && game && !animation && !interval2 && animationWait.length === 0 && playersRound2 !== undefined) {
@@ -539,7 +556,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '20px' }}>
                                 {playersRound2.map((p, key) => (
                                     <div className={'player-block'
-                                        + (p.address.toString() === props.venomWallet?.address ? ' you' : '')} key={key}>
+                                        + (p.address.toString() === (
+                                            props.typeNetwork === 'venom'
+                                                ? props.venomWallet?.address : props.everWallet.account?.address.toString()
+                                        ) ? ' you' : '')} key={key}>
                                         <div className={'player in-' + key}></div>
                                         <div>{addStr(p.address.toString())}</div>
                                     </div>
@@ -607,7 +627,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <img src={win1} />
                                 <h3 className='raider-font' style={{ textAlign: 'center' }}>You are the winner!</h3>
                                 <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
-                                <small>Reward: {weiToEth(winData, 9)} VENOM Gas: ~0.06 VENOM</small>
+                                <small>Reward: {weiToEth(winData, 9)} {props.typeNetwork.toUpperCase()} Gas: ~0.06 {props.typeNetwork.toUpperCase()}</small>
                             </div>
                         </div>
                         <div className="tre-btn">
@@ -636,7 +656,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <img src={win3} />
                                 <h3 className='raider-font' style={{ textAlign: 'center' }}>Jackpot!</h3>
                                 <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
-                                <small>Jackpot: {weiToEth(winData, 9)} VENOM Gas: ~0.06 VENOM</small>
+                                <small>Jackpot: {weiToEth(winData, 9)} {props.typeNetwork.toUpperCase()} Gas: ~0.06 {props.typeNetwork.toUpperCase()}</small>
                             </div>
                         </div>
                         <div className="tre-btn">

@@ -142,7 +142,39 @@ export const gameAbi = {
                 { name: 'roundId', type: 'uint64' }
             ],
             outputs: [
-                { components: [ { name: 'expiresAt', type: 'uint64' }, { components: [ { components: [ { name: 'cell', type: 'uint16' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'coordinate', type: 'tuple' } ], name: 'from', type: 'tuple' }, { components: [ { name: 'cell', type: 'uint16' }, { components: [ { name: 'x', type: 'uint16' }, { name: 'y', type: 'uint16' } ], name: 'coordinate', type: 'tuple' } ], name: 'to', type: 'tuple' } ], name: 'playerSteps', type: 'map(address,tuple[])' } ], name: 'move', type: 'optional(tuple)' }
+                {
+                    components: [
+                        { name: 'expiresAt', type: 'uint64' },
+                        {
+                            components: [
+                                {
+                                    components: [ { name: 'cell', type: 'uint16' },
+                                        {
+                                            components: [ { name: 'x', type: 'uint16' },
+                                                { name: 'y', type: 'uint16' } ],
+                                            name: 'coordinate',
+                                            type: 'tuple'
+                                        } ],
+                                    name: 'from',
+                                    type: 'tuple'
+                                },
+                                {
+                                    components: [ { name: 'cell', type: 'uint16' },
+                                        {
+                                            components: [ { name: 'x', type: 'uint16' },
+                                                { name: 'y', type: 'uint16' } ],
+                                            name: 'coordinate',
+                                            type: 'tuple'
+                                        } ],
+                                    name: 'to',
+                                    type: 'tuple'
+                                } ],
+                            name: 'playerSteps',
+                            type: 'map(address,tuple[])'
+                        } ],
+                    name: 'move',
+                    type: 'optional(tuple)'
+                }
             ]
         },
         {

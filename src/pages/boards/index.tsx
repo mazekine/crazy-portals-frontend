@@ -28,6 +28,7 @@ interface MainProps {
 
 export const Boards: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
+    const [ firstRender2, setFirstRender2 ] = React.useState<boolean>(false)
 
     const [ listGames, setListGames ] = React.useState<Address[] | undefined>(undefined)
 
@@ -54,13 +55,17 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
             setGame(new Game({
                 address: '',
                 addressUser: '',
-                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet
+                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet,
+                network: props.typeNetwork
             }))
         }
     }, [ props.everWallet, props.venomWallet ])
 
     useEffect(() => {
-        if (game) {
+        if (game && !firstRender2 && (props.venomWallet || props.everWallet)) {
+            setFirstRender2(true)
+
+            // console.log('=======')
             game.getAllGames().then((games) => {
                 if (games) setListGames(games)
             })
@@ -69,6 +74,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
     useEffect(() => {
         if (listGames && game) {
+            // console.log('=======')
             getInfo()
         }
     }, [ listGames ])

@@ -20,6 +20,7 @@ import { useEverWallet } from './logic/wallet/useEverWallet'
 import { Game, VenomWallet } from './logic/game'
 
 import load from './img/load.gif'
+import { StorageGame } from './logic/storage'
 
 const widthDesktop = 1160
 
@@ -98,6 +99,8 @@ export const App: React.FC = () => {
     const history = useNavigate()
 
     // const provider = new Wallet()
+
+    const storage = new StorageGame()
 
     const getAddress = async (provider: any) => {
         const providerState = await provider?.getProviderState?.()
@@ -179,6 +182,11 @@ export const App: React.FC = () => {
             })
 
             onInitButtonClick()
+
+            const network = storage.get('network')
+            if (network && network !== '') {
+                setTypeNetwork(network)
+            }
         }
     }, [])
 
@@ -204,6 +212,10 @@ export const App: React.FC = () => {
     useEffect(() => {
         window.scrollBy(0, -100000)
     }, [ location.pathname ])
+
+    useEffect(() => {
+        storage.save('network', typeNetwork)
+    }, [ typeNetwork ])
 
     return (
         <AppRoot
