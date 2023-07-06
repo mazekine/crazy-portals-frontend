@@ -410,9 +410,32 @@ class Game {
         return [ fullArr, localPortals ]
     }
 
+    public async getGameDay (): Promise<Address | undefined> {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('Error wallet')
+            return undefined
+        }
+
+        const net = this._network === 'venom' ? 'venom' : 'everscale'
+
+        const dateObj = new Date()
+        const month = dateObj.getUTCMonth() + 1 // months from 1-12
+        const day = dateObj.getUTCDate()
+        const year = dateObj.getUTCFullYear()
+
+        const newdate = year + '-' + month + '-' + day
+
+        const hash = await axios.get('https://cpapi.mazekine.com/v2/featuredBoards?net=' + net
+            + '&subnet=' + (this._network === 'venom' ? 'devnet' : 'mainnet') + '&date_le=' + newdate)
+
+        return new Address(hash.data)
+    }
+
     public async getAllGames (): Promise<Address[] | undefined> {
-        if (!this._wallet) return undefined
-        if (!this._wallet.provider) return undefined
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('Error wallet')
+            return undefined
+        }
 
         const codeHash = await axios.get('https://cpapi.mazekine.com/v2/contractHash')
         console.log('codeHash', codeHash)
