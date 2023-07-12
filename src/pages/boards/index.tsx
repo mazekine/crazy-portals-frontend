@@ -23,7 +23,8 @@ interface MainProps {
     everWallet: EverWallet,
     openModal: Function,
     venomWallet: VenomWallet | undefined,
-    typeNetwork: 'venom' | 'ever'
+    typeNetwork: 'venom' | 'ever',
+    nameNetwork: 'venom' | 'ever'
 }
 
 export const Boards: React.FC<MainProps> = (props: MainProps) => {
@@ -150,14 +151,14 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
                                     <div className="info-block">
                                         <div>
-                                            <h3>{weiToEth(infoGamesDay.jackpot, 9)}<span>{props.typeNetwork.toUpperCase()}</span></h3>
+                                            <h3>{weiToEth(infoGamesDay.jackpot, 9)}<span>{props.nameNetwork.toUpperCase()}</span></h3>
                                             <div className="blue-text">remaining prize fund</div>
                                         </div>
 
                                         <div>
                                             <h4>
                                                 {weiToEth(infoGamesDay.rounds?._rounds[0].prizeFund, 9)}
-                                                <span>{props.typeNetwork.toUpperCase()}</span>
+                                                <span>{props.nameNetwork.toUpperCase()}</span>
                                             </h4>
                                             <div className="blue-text">prize per round</div>
                                         </div>
@@ -196,9 +197,9 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                                             <th>Size</th>
                                             <th>Portals</th>
                                             <th>Rounds</th>
-                                            <th>Prize per<br /> round, {props.typeNetwork.toUpperCase()}</th>
-                                            {/* <th>Winnings,<br /> {props.typeNetwork.toUpperCase()}</th> */}
-                                            <th>Balance left,<br /> {props.typeNetwork.toUpperCase()}</th>
+                                            <th>Prize per<br /> round, {props.nameNetwork.toUpperCase()}</th>
+                                            {/* <th>Winnings,<br /> {props.nameNetwork.toUpperCase()}</th> */}
+                                            <th>Balance left,<br /> {props.nameNetwork.toUpperCase()}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

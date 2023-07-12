@@ -39,34 +39,66 @@ const standaloneFallback = () => EverscaleStandaloneClient.create({
 
 const initVenomConnect = async () => new VenomConnect({
     theme: initTheme,
-    checkNetworkId: 1002,
+    checkNetworkId: [ 42, 1000, 1002 ],
     providersOptions: {
+
         venomwallet: {
-            links: {},
+            links: {
+                extension: [
+                    {
+                        browser: 'chrome',
+                        link: 'https://chrome.google.com/webstore/detail/venom-wallet/ojggmchlghnjlapmfbnjholfjkiidbch'
+                    }, {
+                        browser: 'chrome',
+                        link: 'https://chrome.google.com/webstore/detail/ever-wallet/cgeeodpfagjceefieflmdfphplkenlfk'
+                    }, {
+                        browser: 'firefox',
+                        link: 'https://addons.mozilla.org/en-US/firefox/addon/ever-wallet'
+                    }
+                ],
+                android: undefined,
+                ios: null
+            },
             walletWaysToConnect: [
                 {
-                    // NPM package
                     package: ProviderRpcClient,
                     packageOptions: {
-                        fallback:
-                  VenomConnect.getPromise('venomwallet', 'extension')
-                  || (() => Promise.reject()),
-                        forceUseFallback: true
-                    },
-                    packageOptionsStandalone: {
-                        fallback: standaloneFallback,
+                        fallback: VenomConnect.getPromise('venomwallet', 'extension') || (() => Promise.reject()),
                         forceUseFallback: true
                     },
                     id: 'extension',
                     type: 'extension'
                 }
             ],
-            defaultWalletWaysToConnect: [
-            // List of enabled options
-                'mobile',
-                'ios',
-                'android'
-            ]
+            defaultWalletWaysToConnect: [ 'mobile', 'ios', 'android' ]
+        },
+
+        everwallet: {
+            links: {
+                extension: [
+                    {
+                        browser: 'chrome',
+                        link: 'https://chrome.google.com/webstore/detail/ever-wallet/cgeeodpfagjceefieflmdfphplkenlfk'
+                    }, {
+                        browser: 'firefox',
+                        link: 'https://addons.mozilla.org/en-US/firefox/addon/ever-wallet'
+                    }
+                ],
+                android: 'https://play.google.com/store/apps/details?id=com.broxus.crystal.app',
+                ios: 'https://apps.apple.com/us/app/ever-wallet-everscale/id1581310780'
+            },
+            walletWaysToConnect: [
+                {
+                    package: ProviderRpcClient,
+                    packageOptions: {
+                        fallback: VenomConnect.getPromise('everwallet', 'extension') || (() => Promise.reject()),
+                        forceUseFallback: true
+                    },
+                    id: 'extension',
+                    type: 'extension'
+                }
+            ],
+            defaultWalletWaysToConnect: [ 'mobile', 'ios', 'android' ]
         }
     }
 })
@@ -82,6 +114,10 @@ export const App: React.FC = () => {
     const [ load1, setLoad ] = React.useState<boolean>(false)
 
     const [ typeNetwork, setTypeNetwork ] = React.useState<'venom' | 'ever'>('venom')
+
+    const [ networkId, setNetworkId ] = React.useState<number>(42)
+
+    const [ nameNetwork, setNameNetwork ] = React.useState<'venom' | 'ever'>('ever')
 
     const [ venomConnect, setVenomConnect ] = React.useState<VenomConnect | undefined>()
     const [ venomWallet, setVenomWallet ] = React.useState<VenomWallet | undefined>()
@@ -102,10 +138,23 @@ export const App: React.FC = () => {
 
     const storage = new StorageGame()
 
+    const getNetwork = async (provider: any) => {
+        const providerState = await provider?.getProviderState?.()
+        const networkId2 = providerState.networkId.toString()
+
+        console.log('networkId2', networkId2)
+
+        setNameNetwork(Number(networkId2) === 42 ? 'ever' : 'venom')
+
+        setNetworkId(Number(networkId2))
+    }
+
     const getAddress = async (provider: any) => {
         const providerState = await provider?.getProviderState?.()
 
         const address2 = providerState?.permissions.accountInteraction?.address.toString()
+
+        getNetwork(provider)
 
         return address2
     }
@@ -231,6 +280,7 @@ export const App: React.FC = () => {
                 address={address}
                 balance={balance}
                 setTypeNetwork={setTypeNetwork}
+                networkId={networkId}
                 // provider={provider}
             />}
             footer={<FooterBlock isDesktop={isDesktop} widthDesktop={widthDesktop} isMobile={isMobile} />}
@@ -261,6 +311,7 @@ export const App: React.FC = () => {
                             openModal={openModal}
                             venomWallet={venomWallet}
                             typeNetwork={typeNetwork}
+                            nameNetwork={nameNetwork}
                         />
                     }/>
 
@@ -275,6 +326,7 @@ export const App: React.FC = () => {
                             venomWallet={venomWallet}
                             typeNetwork={typeNetwork}
                             load1={load1}
+                            nameNetwork={nameNetwork}
                         />
                     }/>
                     <Route path="/boards/:address/:round" element={
@@ -288,6 +340,7 @@ export const App: React.FC = () => {
                             venomWallet={venomWallet}
                             typeNetwork={typeNetwork}
                             load1={load1}
+                            nameNetwork={nameNetwork}
                         />
                     }/>
                 </Routes>

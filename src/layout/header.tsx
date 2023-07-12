@@ -22,7 +22,8 @@ interface HeaderProps {
     venomProvider: any,
     address: any,
     balance: any,
-    setTypeNetwork: Function
+    setTypeNetwork: Function,
+    networkId: number
 }
 
 export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
@@ -67,13 +68,13 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
             }
             after={
                 <div className="balance-full-block">
-                    <div className="change_network">
+                    {/* <div className="change_network">
                         <select value={props.typeNetwork} onChange={e => changeNetwork(e)}>
                             <option value="venom">Venom</option>
                             <option value="ever">Ever</option>
                         </select>
-                    </div>
-                    { props.typeNetwork === 'ever' ? <> {
+                    </div> */}
+                    {/* { props.networkId === 0 || true ? <> {
                         props.everWallet && props.everWallet.account
                             ? <div className="balance-block">
                                 <img src={user} className="logo-24" />
@@ -90,14 +91,14 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
                             Connect Ever
                                 </Button>
                             </div>
-                    } </> : null }
+                    } </> : null } */}
 
-                    {props.typeNetwork === 'venom' && props.venomConnect
+                    { props.venomConnect
                         ? <> {props.address && props.balance ? <div className="balance-block">
                             <img src={user} className="logo-24" />
                             <div>
                                 <div style={{ fontSize: '14px' }}>{addStr(props.address)}</div>
-                                <div className='text-secondory'>{weiToEth(props.balance.toString(), 9)} VENOM</div>
+                                <div className='text-secondory'>{weiToEth(props.balance.toString(), 9)} {props.networkId === 42 ? 'EVER' : 'VENOM'}</div>
                             </div>
                             <Button type="secondory" size='m' onClick={() => onDisconnectButtonClick()}>
                                 <img src={logout} className="logo-20"  />

@@ -29,7 +29,8 @@ interface MainProps {
     openModal: Function,
     venomWallet: VenomWallet | undefined,
     typeNetwork: 'venom' | 'ever',
-    load1: boolean
+    load1: boolean,
+    nameNetwork: 'venom' | 'ever'
 }
 
 interface AnimationWait {
@@ -627,7 +628,10 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <img src={win1} />
                                 <h3 className='raider-font' style={{ textAlign: 'center' }}>You are the winner!</h3>
                                 <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
-                                <small>Reward: {weiToEth(winData, 9)} {props.typeNetwork.toUpperCase()} Gas: ~0.06 {props.typeNetwork.toUpperCase()}</small>
+                                <small>Reward: {weiToEth(winData, 9)} {props.nameNetwork.toUpperCase()} Gas: ~0.06 {
+                                props.nameNetwork.toUpperCase()
+            
+                                }</small>
                             </div>
                         </div>
                         <div className="tre-btn">
@@ -656,7 +660,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <img src={win3} />
                                 <h3 className='raider-font' style={{ textAlign: 'center' }}>Jackpot!</h3>
                                 <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
-                                <small>Jackpot: {weiToEth(winData, 9)} {props.typeNetwork.toUpperCase()} Gas: ~0.06 {props.typeNetwork.toUpperCase()}</small>
+                                <small>Jackpot: {weiToEth(winData, 9)} {props.nameNetwork.toUpperCase()} Gas: ~0.06 {props.nameNetwork.toUpperCase()}</small>
                             </div>
                         </div>
                         <div className="tre-btn">
