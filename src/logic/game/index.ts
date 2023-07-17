@@ -807,24 +807,26 @@ class Game {
         }
     }
 
-    // public async getRoundLatestMove (address: Address, round: string): Promise<RoundLatestMove | undefined> {
-    //     if (!this._wallet || !this._wallet.provider) {
-    //         console.log('error getRoundLatestMove')
-    //         return undefined
-    //     }
+    public async getRoundLatestMove (address: Address, round: string): Promise<RoundLatestMove | undefined> {
+        if (!this._wallet || !this._wallet.provider) {
+            console.log('error getRoundLatestMove')
+            return undefined
+        }
 
-    //     const contractGame = new this._wallet.provider.Contract(abi, address)
+        const contractGame = new this._wallet.provider.Contract(abi, address)
 
-    //     try {
-    //         const data = contractGame.methods.getRoundLatestMove({ answerId: 0, roundId: round } as never)
+        try {
+            const getData = contractGame.methods.getRoundLatestMove({ answerId: 0, roundId: round } as never)
 
-    //         console.log('getPlayerCell', data)
-    //         return data
-    //     } catch (error) {
-    //         console.log('getPlayerCell', error)
-    //         return undefined
-    //     }
-    // }
+            const data = await getData.call() as RoundLatestMove
+
+            console.log('getRoundLatestMove', data)
+            return data
+        } catch (error) {
+            console.log('getRoundLatestMove', error)
+            return undefined
+        }
+    }
 
     public async getBalance (address: Address): Promise<string | undefined> {
         if (!this._wallet || !this._wallet.provider) {

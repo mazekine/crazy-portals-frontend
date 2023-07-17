@@ -55,6 +55,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     const  [ win, setWin ] = React.useState<number>(0) // 0 - no 1 - win 2 - jecpot
 
     const  [ timer, setTimer ] = React.useState<string>('00:00')
+    const  [ timer2, setTimer2 ] = React.useState<string>('0:0')
 
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
 
@@ -74,6 +75,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     const  [ actions, setActions ] = React.useState<Action[]>([])
 
     const  [ winData, setWinData ] = React.useState<string | undefined>(undefined)
+
+    const  [ expMove, setExpMove ] = React.useState<number>(0)
 
     const { address, round } = useParams()
     const history = useNavigate()
@@ -96,6 +99,25 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                 clearInterval(interv)
             }
             setTimer(`${duration.minutes()}:${duration.seconds()}`)
+        }, interval)
+    }
+
+    function startTimer2 (date: number) {
+        const eventTime = date // Timestamp - Sun, 21 Apr 2013 13:00:00 GMT
+        const currentTime = Date.now() / 1000 // Timestamp - Sun, 21 Apr 2013 12:30:00 GMT
+        const diffTime = eventTime - currentTime
+        let duration = moment.duration(diffTime * 1000, 'milliseconds')
+        const interval = 1000
+
+        if (diffTime < 0) return
+
+        const interv = setInterval(() => {
+            duration = moment.duration(Number(duration) - interval, 'milliseconds')
+            if (duration.seconds() === 0 && duration.minutes() === 0) {
+                setTimer2('0:0')
+                clearInterval(interv)
+            }
+            setTimer2(`${duration.minutes()}:${duration.seconds()}`)
         }, interval)
     }
 
@@ -267,6 +289,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         const data = await game.joinRound(new Address(address), round)
 
         props.openModal('close')
+
+        getLastMove()
         return true
     }
 
@@ -279,7 +303,25 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         const data = await game.startRoll(new Address(address))
 
         props.openModal('close')
+
+        getLastMove()
         return true
+    }
+
+    async function getLastMove () {
+        if (!game || !address || !round) {
+            console.error('getLastMove null')
+            return undefined
+        }
+        const data = await game.getRoundLatestMove(new Address(address), round)
+
+        if (!data) {
+            console.error('getLastMove null')
+            return undefined
+        }
+        setExpMove(Number(data.move.expiresAt))
+
+        startTimer2(Number(data.move.expiresAt))
     }
 
     async function addAction (test: string, type_you: boolean) {
@@ -455,18 +497,32 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
     }, [ props.venomWallet, props.everWallet ])
 
     useEffect(() => {
+        // if (interval2 && !animation) {
+        //     console.log('===stop update')
+        //     clearInterval(interval2)
+        //     setInterval2(undefined)
+        //     return
+        // }
+
         if (address && round && game && !animation && !interval2 && animationWait.length === 0 && playersRound2 !== undefined) {
+            setInterval2(undefined)
             console.log('===start update')
             const int = setInterval((playersRound3 = playersRound2) => {
                 console.log('update', !animation)
                 getPlayers(new Address(address), true, playersRound3)
-            }, 2600)
+            }, 3600)
 
             setInterval2(int)
 
             // return () => clearInterval(int)
         } if (interval2 && (animation || animationWait.length !== 0)) {
             console.log('===stop update')
+            clearInterval(interval2)
+            setInterval2(undefined)
+        }
+
+        if (animationWait.length !== 0) {
+            console.log('===stop update2')
             clearInterval(interval2)
             setInterval2(undefined)
         }
@@ -557,12 +613,16 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '20px' }}>
                                 {playersRound2.map((p, key) => (
                                     <div className={'player-block'
-                                        + (p.address.toString() === (
-                                            props.typeNetwork === 'venom'
-                                                ? props.venomWallet?.address : props.everWallet.account?.address.toString()
-                                        ) ? ' you' : '')} key={key}>
-                                        <div className={'player in-' + key}></div>
-                                        <div>{addStr(p.address.toString())}</div>
+                                    } key={key}>
+                                        <div className={'player-in-block' + (p.address.toString() === (
+                                            props.venomWallet?.address
+                                        ) ? ' you' : '')}>
+                                            <div className={'player in-' + key}></div>
+                                            <div>{addStr(p.address.toString())}</div>
+                                        </div>
+                                        <div className="name-player">
+                                            {props.venomWallet?.address === p.address.toString() ? 'You' : 'Anonymous'}
+                                        </div>
                                     </div>
                                 ))}
 
@@ -589,7 +649,9 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                     )
                                 ) === -1
                             ) ? null
-                                : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '60%' }} >
+                                : <div
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '60%' }}
+                                    className="big-btn" >
                                     {/* {props.typeNetwork === 'venom' && props.venomWallet && props.venomWallet.address ?
                                     playersRound2.findIndex(p => p.address.toString() === props.venomWallet.address) !== -1 ?
                                     <Button onClick={() => startRoll()}>Roll</Button>
@@ -602,7 +664,15 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                         )
                                     ) > -1
                                         ? <div style={{ width: '100%' }}>
-                                            <Button onClick={() => startRoll()} stretched load={props.load1}>Roll</Button>
+                                            <Button
+                                                onClick={() => startRoll()}
+                                                stretched
+                                                load={props.load1 || timer2 !== '0:0'}
+                                            >Roll</Button>
+                                            <small style={{ textAlign: 'center', display: 'block', width: '100%' }}>
+                                                {timer2 !== '0:0' ? timer2 : 'Gas: ~0.06 '
+                                                + props.nameNetwork.toUpperCase() }
+                                            </small>
                                             {thisRound.giveUpAllowed
                                                 ? <Button
                                                     onClick={() => giveUp()}
@@ -611,10 +681,12 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                                     size="m"
                                                     style={{ marginTop: '30px' }}
                                                 >Give Up</Button> : null }
+
                                         </div>
                                         : <Button onClick={() => joinRound()} stretched load={props.load1}>Join</Button> }
                                     {/* <Button onClick={() => joinRound()}>Join</Button>
                                 <Button onClick={() => startRoll()}>Roll</Button> */}
+
                                 </div> }
 
                         </div>
@@ -629,8 +701,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <h3 className='raider-font' style={{ textAlign: 'center' }}>You are the winner!</h3>
                                 <Button onClick={() => claim()} stretched load={props.load1}>Claim reward</Button>
                                 <small>Reward: {weiToEth(winData, 9)} {props.nameNetwork.toUpperCase()} Gas: ~0.06 {
-                                props.nameNetwork.toUpperCase()
-            
+                                    props.nameNetwork.toUpperCase()
+
                                 }</small>
                             </div>
                         </div>

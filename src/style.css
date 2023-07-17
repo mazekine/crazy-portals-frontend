@@ -59,6 +59,7 @@ body {
     justify-content: center;
     /* padding-top: 12px; */
     padding-bottom: 16px;
+    font-size: 14px;
 }
 
 .nav-bar > * {
