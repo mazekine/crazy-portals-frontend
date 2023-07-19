@@ -78,3 +78,9 @@
     align-items: center;
     justify-content: center;
 }
+
+.btn-disabled,
+.btn-disabled:hover {
+    opacity: 0.6;
+    cursor: default;
+}

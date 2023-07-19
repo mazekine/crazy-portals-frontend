@@ -179,7 +179,8 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
                             </div>
 
                         </div> : null}
-                    <div className="content-block" style={props.isMobile ? { width: '100%' } : { width: '60%', marginLeft: '30px' }}>
+                    <div className="content-block" style={props.isMobile ? { width: '100%' }
+                        : { width: infoGamesDay && infoGamesDay.rounds ? '60%' : '100%', marginLeft: '30px' }}>
 
                         <div className="title-bar">
                             <h3 className='raider-font'>All boards</h3>

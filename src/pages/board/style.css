@@ -376,7 +376,19 @@
     margin-top: 10px;
 }
 
-.big-btn .btn {
+.big-btn .l-btn {
     font-size: 20px!important;
     font-weight: 400;
+}
+
+.boosters {
+    width: 60%;
+}
+
+.player-in-block.you {
+    background-color: #EEF4FF;
+}
+
+.boosters .btn {
+    margin-bottom: 6px;
 }

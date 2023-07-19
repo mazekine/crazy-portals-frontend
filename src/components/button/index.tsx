@@ -11,7 +11,8 @@ interface MainProps {
     stretched?: boolean,
     load?: boolean,
     onClick?: MouseEventHandler<HTMLButtonElement>,
-    icon?: any
+    icon?: any,
+    disabled?: boolean
     [x: string]: any
 }
 
@@ -22,6 +23,7 @@ export const Button: React.FC<MainProps> = ({
     stretched = false,
     load = false,
     onClick = () => null,
+    disabled = false,
     icon,
     ...restProps
 }: MainProps) => {
@@ -35,8 +37,8 @@ export const Button: React.FC<MainProps> = ({
 
     return (
         <button {...restProps} className={
-            `btn ${type}-btn ${size}-btn ${stretched ? 'stretched-btn' : ''} ${load ? ' load-btn' : ''}`
-        } onClick={!load ? onClick : () => null}>
+            `btn ${type}-btn ${size}-btn ${stretched ? 'stretched-btn' : ''} ${load ? ' load-btn' : ''} ${disabled ? 'btn-disabled' : ''}`
+        } onClick={!load ? onClick : () => null} disabled={disabled}>
             {load ? <Oval
                 height={20}
                 width={20}

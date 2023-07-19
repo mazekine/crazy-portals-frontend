@@ -571,13 +571,13 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
                 {game && address && infoGame && round && playersRound2 && win === 0 && infoGame.rounds && thisRound
                     ? <div className="page-block">
-                        <div className="left-block">
+                        <div className="left-block" >
                             <div className="title-bar">
                                 <h3 className='raider-font'>Actions</h3>
 
                             </div>
 
-                            <div className="group-block">
+                            <div className="group-block" style={{ maxHeight: Number(infoGame.info?._board.columns) * 43 }}>
                                 {actions.map((act, key) => (
                                     <div className={'cell' + (act.type_you ? ' black' : '')} key={key}>{act.text}</div>
                                 ))}
@@ -611,7 +611,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', marginTop: '20px' }}>
-                                {playersRound2.map((p, key) => (
+                                {playersRound2.slice(0, 4).map((p, key) => (
                                     <div className={'player-block'
                                     } key={key}>
                                         <div className={'player-in-block' + (p.address.toString() === (
@@ -625,6 +625,13 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                         </div>
                                     </div>
                                 ))}
+                                {playersRound2.length > 5
+                                    ? <div className={'player-block'
+                                    } >
+                                        <div className="name-player">
+                                            +{playersRound2.length - 5} more players
+                                        </div>
+                                    </div> : null}
 
                             </div>
 
@@ -679,7 +686,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                                     stretched
                                                     type="outline"
                                                     size="m"
-                                                    style={{ marginTop: '30px' }}
+                                                    style={{ marginTop: '20px' }}
                                                 >Give Up</Button> : null }
 
                                         </div>
@@ -688,6 +695,29 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                                 <Button onClick={() => startRoll()}>Roll</Button> */}
 
                                 </div> }
+
+                            <div className="boosters">
+                                <h3 className='raider-font'>Boosters</h3>
+
+                                <Button
+                                    stretched
+                                    size='m'
+                                    disabled={true}
+                                >Set mine</Button>
+
+                                <Button
+                                    stretched
+                                    size='m'
+                                    disabled={true}
+                                >Power shield</Button>
+
+                                <Button
+                                    stretched
+                                    size='m'
+                                    disabled={true}
+                                >Portal immunity</Button>
+
+                            </div>
 
                         </div>
 
