@@ -56,6 +56,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     const  [ timer, setTimer ] = React.useState<string>('00:00')
     const  [ timer2, setTimer2 ] = React.useState<string>('0:0')
+    const  [ timer2A, setTimer2A ] = React.useState<NodeJS.Timer | undefined>(undefined)
 
     const  [ infoGame, setInfoGame ] = React.useState<InfoGames | undefined>(undefined)
 
@@ -116,9 +117,12 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             if (duration.seconds() === 0 && duration.minutes() === 0) {
                 setTimer2('0:0')
                 clearInterval(interv)
+                setTimer2A(undefined)
             }
             setTimer2(`${duration.minutes()}:${duration.seconds()}`)
         }, interval)
+
+        setTimer2A(interv)
     }
 
     function playerGo (
@@ -319,17 +323,19 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             console.error('getLastMove null')
             return undefined
         }
-        setExpMove(Number(data.move.expiresAt))
+        if (data.move) {
+            setExpMove(Number(data.move.expiresAt))
 
-        startTimer2(Number(data.move.expiresAt))
+            startTimer2(Number(data.move.expiresAt))
+        }
     }
 
     async function addAction (test: string, type_you: boolean) {
         const text = type_you ? 'You ' + test.slice(19, test.length) : test
-        setActions(act => [ ...act, {
+        setActions(act => [ {
             text,
             type_you
-        } ])
+        }, ...act ])
     }
 
     function isAddr (addr: Address) {
@@ -400,6 +406,8 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                 if (data.round === round || data.roundId === round) {
                     if (ev === 'PlayerMoved') {
                         const typedData = data as PlayerMoved
+
+                        clearInterval(timer2A) // ???
 
                         if (Number(typedData.from.cell) === 0) {
                             setTimeout(() => {
@@ -510,7 +518,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
             const int = setInterval((playersRound3 = playersRound2) => {
                 console.log('update', !animation)
                 getPlayers(new Address(address), true, playersRound3)
-            }, 3600)
+            }, 4600)
 
             setInterval2(int)
 

@@ -104,8 +104,8 @@ export const HeaderBlock: React.FC<HeaderProps> = (props: HeaderProps) => {
                                 <img src={logout} className="logo-20"  />
                             </Button>
                         </div> : <div className="balance-block">
-                            <Button type="default" size='l' onClick={() => onConnectButtonClick()}>
-                            Connect Venom
+                            <Button type="default" size='l' onClick={() => onConnectButtonClick()} >
+                            Connect wallet
                             </Button>
                         </div>}
                         </> : null }

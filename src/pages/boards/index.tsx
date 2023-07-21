@@ -30,6 +30,7 @@ interface MainProps {
 export const Boards: React.FC<MainProps> = (props: MainProps) => {
     const [ firstRender, setFirstRender ] = React.useState<boolean>(false)
     const [ firstRender2, setFirstRender2 ] = React.useState<boolean>(false)
+    const [ firstRender3, setFirstRender3 ] = React.useState<boolean>(false)
 
     const [ listGames, setListGames ] = React.useState<Address[] | undefined>(undefined)
 
@@ -67,38 +68,89 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
         return true
     }
 
-    useEffect(() => {
-        if (!firstRender
-            && (props.typeNetwork === 'venom' ? props.venomWallet?.provider && props.venomWallet?.account : props.everWallet)) {
-            setFirstRender(true)
-            setGame(new Game({
+    async function loadDataPage (accaount: boolean, wallet: VenomWallet | undefined) {
+        if (accaount) {
+            const gameLocal = new Game({
                 address: '',
                 addressUser: '',
-                wallet: props.typeNetwork === 'venom' ? props.venomWallet : props.everWallet,
+                wallet,
                 network: props.typeNetwork
-            }))
-        }
-    }, [ props.everWallet, props.venomWallet ])
-
-    useEffect(() => {
-        if (game && !firstRender2 && (props.venomWallet || props.everWallet)) {
-            setFirstRender2(true)
-
-            // console.log('=======')
-            game.getAllGames().then((games) => {
-                if (games) setListGames(games)
             })
-        }
-    }, [ game, props.venomWallet, props.everWallet ])
-
-    useEffect(() => {
-        if (listGames && game) {
-            // console.log('=======')
-            getInfo()
+            setGame(gameLocal)
+            gameLocal.getAllGames().then((games) => {
+                if (games) {
+                    getInfo(games)
+                    setListGames(games)
+                }
+            })
 
             getBoardDay()
+        } else {
+            setListGames(undefined)
+            setInfoGamesDay(undefined)
+            setInfoGames(undefined)
+            setGame(undefined)
+            setGame(undefined)
         }
-    }, [ listGames ])
+    }
+
+    useEffect(() => {
+        // if (!firstRender &&
+        //      props.venomWallet?.provider && props.venomWallet?.account) {
+        //     setFirstRender(true)
+        //     setGame(new Game({
+        //         address: '',
+        //         addressUser: '',
+        //         wallet: props.venomWallet,
+        //         network: props.typeNetwork
+        //     }))
+        // }
+        // if (firstRender && !props.venomWallet?.account) {
+        //     setFirstRender3(false)
+        // }
+    }, [ props.venomWallet?.account ])
+
+    useEffect(() => {
+        // if (game && !firstRender2  && props.venomWallet?.account) {
+        //     setFirstRender2(true)
+
+        //     // console.log('=======')
+        //     game.getAllGames().then((games) => {
+        //         if (games) setListGames(games)
+        //     })
+        // }
+        // if (firstRender2 && !props.venomWallet?.account) {
+        //     setFirstRender3(false)
+
+        //     setListGames([])
+        // }
+    }, [ game, props.venomWallet?.account ])
+
+    useEffect(() => {
+        // if (props.venomWallet) loadDataPage(!!props.venomWallet?.account, props.venomWallet)
+        // if (listGames && game && !firstRender3 && props.venomWallet?.account) {
+        //     setFirstRender3(true)
+        //     // console.log('=======')
+        //     getInfo()
+
+        //     getBoardDay()
+        // }
+        // if (firstRender3 && !props.venomWallet?.account) {
+        //     setFirstRender3(false)
+
+        //     setInfoGamesDay(undefined)
+        // }
+    }, [ listGames, props.venomWallet?.account ])
+
+    useEffect(() => {
+        if (props.venomWallet?.address) {
+            console.log('Test address', props.venomWallet?.address)
+            loadDataPage(true, props.venomWallet)
+        } else if (!props.venomWallet?.address) {
+            console.log('no address')
+            loadDataPage(false, props.venomWallet)
+        }
+    }, [ props.venomWallet?.address && props.venomWallet?.account ])
 
     return (
         <Panel id={props.id}>

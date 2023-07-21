@@ -44,3 +44,7 @@
 .change_network {
     margin-right: 16px;
 }
+
+.balance-block .default-btn {
+    height: 48px!important;
+}
