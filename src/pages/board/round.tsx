@@ -412,7 +412,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                         if (Number(typedData.from.cell) === 0) {
                             setTimeout(() => {
                                 getPlayers(addr, false, playersRound3)
-                            }, 500)
+                            }, 700)
                         } else {
                             console.log('setAnimationWait', animationWait2)
                             // setAnimation(true)
@@ -435,7 +435,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                         const typedData = data as PlayerMoved
                         setTimeout(() => {
                             getPlayers(addr, true, playersRound3)
-                        }, 500)
+                        }, 700)
 
                         addAction(`Player ${addStr(typedData.player.toString())} joined the round`, isAddr(typedData.player))
                     }
