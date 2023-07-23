@@ -209,14 +209,20 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
 
     async function getPlayers (address1: Address, update: boolean = false, playersRound3 = playersRound2) {
         if (!game) {
-            console.log('error getPlayers')
+            console.error('error getPlayers game')
             return undefined
         }
         const players3 = await game.getPlayersForRound(address1, round ?? '')
 
+        if (!playersRound2) { // first update
+            setPlayersRound2(players3)
+            return true
+        }
+
         if (update && playersRound3) {
+            console.log('getPlayers playersRound3', playersRound3)
             for (let i = 0; i < playersRound3.length; i++) {
-                const ind = playersRound3?.findIndex(p => p.address.toString() === playersRound3[i].address.toString())
+                const ind = playersRound3?.findIndex(p => p.address.toString() === playersRound2[i].address.toString())
                 if (ind === -1) {
                     console.log('new player')
                     setPlayersRound2(players3)
@@ -254,6 +260,7 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
         getPlayers(list[0])
 
         if (info[0] && info[0].rounds) {
+            console.log('TIMER', info[0].rounds._rounds.filter(r => r.id === round)[0])
             startTimer(Number(info[0].rounds._rounds.filter(r => r.id === round)[0].validUntil))
         }
 
@@ -410,9 +417,9 @@ export const Round: React.FC<MainProps> = (props: MainProps) => {
                         clearInterval(timer2A) // ???
 
                         if (Number(typedData.from.cell) === 0) {
-                            setTimeout(() => {
+                            setTimeout(() => { // ????
                                 getPlayers(addr, false, playersRound3)
-                            }, 700)
+                            }, 200) //
                         } else {
                             console.log('setAnimationWait', animationWait2)
                             // setAnimation(true)

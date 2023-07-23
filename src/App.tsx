@@ -140,6 +140,7 @@ export const App: React.FC = () => {
 
     const getNetwork = async (provider: any) => {
         const providerState = await provider?.getProviderState?.()
+        if (!providerState) return
         const networkId2 = providerState.networkId.toString()
 
         console.log('networkId2', networkId2)

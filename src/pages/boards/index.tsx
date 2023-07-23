@@ -42,9 +42,12 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
 
     const history = useNavigate()
 
-    async function getInfo (list: Address[] | undefined = listGames) {
-        if (!game || !list) return undefined
-        const info = await game.getAllInfoGames(list)
+    async function getInfo (list: Address[] | undefined = listGames, gameLocal: Game | undefined = game) {
+        if (!gameLocal || !list) {
+            console.error('getInfo game list')
+            return undefined
+        }
+        const info = await gameLocal.getAllInfoGames(list)
 
         if (!info) return undefined
         setInfoGames(info)
@@ -52,16 +55,25 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
         return true
     }
 
-    async function getBoardDay () {
-        if (!game) return undefined
+    async function getBoardDay (gameLocal: Game | undefined = game) {
+        if (!gameLocal) {
+            console.error('getBoardDay game')
+            return undefined
+        }
 
-        const address = await game.getGameDay()
+        const address = await gameLocal.getGameDay()
 
-        if (!address) return undefined
+        if (!address) {
+            console.error('getBoardDay address')
+            return undefined
+        }
 
-        const info = await game.getAllInfoGames([ address ])
+        const info = await gameLocal.getAllInfoGames([ address ])
 
-        if (!info) return undefined
+        if (!info) {
+            console.error('getBoardDay info')
+            return undefined
+        }
 
         setInfoGamesDay(info[0])
 
@@ -69,6 +81,7 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
     }
 
     async function loadDataPage (accaount: boolean, wallet: VenomWallet | undefined) {
+        console.log('getData', accaount)
         if (accaount) {
             const gameLocal = new Game({
                 address: '',
@@ -79,12 +92,13 @@ export const Boards: React.FC<MainProps> = (props: MainProps) => {
             setGame(gameLocal)
             gameLocal.getAllGames().then((games) => {
                 if (games) {
-                    getInfo(games)
+                    getInfo(games, gameLocal)
                     setListGames(games)
                 }
             })
 
-            getBoardDay()
+            getBoardDay(gameLocal)
+            // console.log('compl', gameLocal)
         } else {
             setListGames(undefined)
             setInfoGamesDay(undefined)
