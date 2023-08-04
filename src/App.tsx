@@ -39,7 +39,7 @@ const standaloneFallback = () => EverscaleStandaloneClient.create({
 
 const initVenomConnect = async () => new VenomConnect({
     theme: initTheme,
-    checkNetworkId: [ 42, 1000, 1002 ],
+    checkNetworkId: [ 0, 42, 1000, 1002 ],
     providersOptions: {
 
         venomwallet: {
