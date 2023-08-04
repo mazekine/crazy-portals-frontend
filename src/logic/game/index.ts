@@ -426,7 +426,7 @@ class Game {
         const newdate = year + '-' + month + '-' + day
 
         const hash = await axios.get('https://cpapi.mazekine.com/v2/featuredBoards?net=' + net
-            + '&subnet=' + (this._network === 'venom' ? 'devnet' : 'mainnet') + '&date_le=' + newdate)
+            + '&subnet=' + (this._network === 'venom' ? 'testnet' : 'mainnet') + '&date_le=' + newdate)
 
         return new Address(hash.data)
     }
